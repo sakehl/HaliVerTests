@@ -1,0 +1,342 @@
+// Generated on 2021-04-08 at 13:47:08
+domain TYPE {
+  
+  unique function class_Ref(): TYPE
+  
+  unique function class_java_DOT_lang_DOT_Object(): TYPE
+  
+  unique function class_EncodedGlobalVariables(): TYPE
+  
+  function directSuperclass(t: TYPE): TYPE
+  
+  function type_of(val: Ref): TYPE
+  
+  axiom Ref_directSuperclass {
+    directSuperclass(class_Ref()) == class_java_DOT_lang_DOT_Object()
+  }
+  
+  axiom EncodedGlobalVariables_directSuperclass {
+    directSuperclass(class_EncodedGlobalVariables()) == class_java_DOT_lang_DOT_Object()
+  }
+}
+
+domain frac {
+  
+  function frac_val(a: frac): Perm
+  
+  axiom frac_eq {
+    (forall a: frac, b: frac :: { frac_val(a),frac_val(b) } (frac_val(a) == frac_val(b)) == (a == b))
+  }
+  
+  axiom frac_bound {
+    (forall a: frac :: { frac_val(a) } 0 / 1 < frac_val(a) && frac_val(a) <= 1 / 1)
+  }
+}
+
+domain zfrac {
+  
+  function zfrac_val(a: zfrac): Perm
+  
+  axiom zfrac_eq {
+    (forall a: zfrac, b: zfrac :: { zfrac_val(a),zfrac_val(b) } (zfrac_val(a) == zfrac_val(b)) == (a == b))
+  }
+  
+  axiom zfrac_bound {
+    (forall a: zfrac :: { zfrac_val(a) } 0 / 1 <= zfrac_val(a) && zfrac_val(a) <= 1 / 1)
+  }
+}
+
+domain VCTArray[CT] {
+  
+  function loc(a: VCTArray[CT], i: Int): CT
+  
+  function alen(a: VCTArray[CT]): Int
+  
+  function second(r: CT): Int
+  
+  axiom good_name_here {
+    (forall a: VCTArray[CT], i: Int :: { (loc(a, i): CT) } (second((loc(a, i): CT)): Int) == (second((loc(a, 0): CT)): Int) + i)
+  }
+  
+  axiom second_injectivity {
+    (forall a: VCTArray[CT], b: VCTArray[CT], i: Int, j: Int :: { (loc(a, i): CT),(loc(b, j): CT) } (second((loc(a, i): CT)): Int) == (second((loc(b, j): CT)): Int) ==> (loc(a, i): CT) == (loc(b, j): CT))
+  }
+  
+  axiom len_nonneg {
+    (forall a: VCTArray[CT] :: { (alen(a): Int) } (alen(a): Int) >= 0)
+  }
+}
+
+domain VCTOption[T] {
+  
+  function VCTNone(): VCTOption[T]
+  
+  function VCTSome(t: T): VCTOption[T]
+  
+  function getVCTOption(o: VCTOption[T]): T
+  
+  axiom not_equal_vct {
+    (forall x: T :: { (VCTSome(x): VCTOption[T]) } (VCTNone(): VCTOption[T]) != (VCTSome(x): VCTOption[T]))
+  }
+  
+  axiom get_axiom_vct {
+    (forall x: T :: { (getVCTOption((VCTSome(x): VCTOption[T])): T) } (getVCTOption((VCTSome(x): VCTOption[T])): T) == x)
+  }
+  
+  axiom get_axiom_vct_2 {
+    (forall x: VCTOption[T] :: { (VCTSome((getVCTOption(x): T)): VCTOption[T]) } (VCTSome((getVCTOption(x): T)): VCTOption[T]) == x)
+  }
+}
+
+//  a field 
+field Integer__item: Int
+
+function instanceof_TYPE_TYPE(t: TYPE, u: TYPE): Bool
+  ensures result == (t == u || directSuperclass(t) == u)
+
+
+function new_frac(x: Perm): frac
+  requires 0 / 1 < x && x <= 1 / 1
+  ensures frac_val(result) == x
+
+
+function new_zfrac(x: Perm): zfrac
+  requires 0 / 1 <= x && x <= 1 / 1
+  ensures zfrac_val(result) == x
+
+
+function getVCTOption1(x: VCTOption[VCTArray[Ref]]): VCTArray[Ref]
+  requires x != (VCTNone(): VCTOption[VCTArray[Ref]])
+{
+  (getVCTOption(x): VCTArray[Ref])
+}
+
+method Ref_cudaEventCreate_EncodedGlobalVariables(diz: Ref, globals: Ref) returns (sys__result: Int)
+  requires diz != null
+{
+  inhale false
+}
+
+method Ref_cudaEventDestroy_EncodedGlobalVariables_Integer(diz: Ref, globals: Ref, e: Int)
+  requires diz != null
+{
+  inhale false
+}
+
+method Ref_cudaEventRecord_EncodedGlobalVariables_Integer_Integer(diz: Ref, globals: Ref, e: Int, i: Int)
+  requires diz != null
+{
+  inhale false
+}
+
+method Ref_cudaEventSynchronize_EncodedGlobalVariables_Integer(diz: Ref, globals: Ref, e: Int)
+  requires diz != null
+{
+  inhale false
+}
+
+method Ref_cudaEventElapsedTime_EncodedGlobalVariables_Integer_Integer(diz: Ref, globals: Ref, begin: Int, end: Int) returns (sys__result: Int)
+  requires diz != null
+{
+  inhale false
+}
+
+method Ref___contract_unsatisfiable__CUDA_Kernel_EncodedGlobalVariables_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer(diz: Ref, globals: Ref, array: VCTOption[VCTArray[Ref]], output: VCTOption[VCTArray[Ref]], size: Int, opencl_gcount: Int, opencl_gsize: Int)
+  requires diz != null
+{
+  inhale array != (VCTNone(): VCTOption[VCTArray[Ref]]) && output != (VCTNone(): VCTOption[VCTArray[Ref]]) && size == 1024 && opencl_gcount == 1 && opencl_gsize == size && ((0 < opencl_gcount && (0 <= 0 ? 1 : 0) < opencl_gsize ==> array != (VCTNone(): VCTOption[VCTArray[Ref]])) && (0 < opencl_gcount ==> (0 <= 0 ? 1 : 0) <= opencl_gsize - 1 ==> opencl_gsize - 1 - 1 < (alen(getVCTOption1(array)): Int)) && (0 < opencl_gcount ==> (forall k_fresh_rw_0__1: Int :: { (loc(getVCTOption1(array), k_fresh_rw_0__1): Ref) } (0 <= 0 ? 1 : 0) <= k_fresh_rw_0__1 + 1 && k_fresh_rw_0__1 + 1 < opencl_gsize ==> acc((loc(getVCTOption1(array), k_fresh_rw_0__1): Ref).Integer__item, opencl_gcount * (1 / 2)))))
+  // assert
+  assert false
+  inhale false
+}
+
+method Ref_loop_body_5_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer_Integer(diz: Ref, opencl_lid: Int, array: VCTOption[VCTArray[Ref]], output: VCTOption[VCTArray[Ref]], size: Int, opencl_gcount: Int, opencl_gsize: Int, opencl_gid: Int)
+  requires diz != null
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires 0 <= opencl_gid && opencl_gid < opencl_gcount && (0 <= opencl_lid && opencl_lid < opencl_gsize)
+  requires 0 < opencl_lid ==> array != (VCTNone(): VCTOption[VCTArray[Ref]]) && opencl_lid - 1 < (alen(getVCTOption1(array)): Int) && acc((loc(getVCTOption1(array), opencl_lid - 1): Ref).Integer__item, 1 / 2)
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+  ensures 0 <= opencl_gid && opencl_gid < opencl_gcount && (0 <= opencl_lid && opencl_lid < opencl_gsize)
+{
+  var tid__2: Int
+  tid__2 := opencl_lid
+  // assert
+  assert tid__2 == opencl_lid
+}
+
+method Ref_parrallel_region_main_2_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz: Ref, opencl_gsize: Int, array: VCTOption[VCTArray[Ref]], output: VCTOption[VCTArray[Ref]], size: Int, opencl_gcount: Int)
+  requires diz != null
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires (0 <= 0 ? 1 : 0) < opencl_gsize ==> array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires (0 <= 0 ? 1 : 0) <= opencl_gsize - 1 ==> opencl_gsize - 1 - 1 < (alen(getVCTOption1(array)): Int)
+  requires (forall k_fresh_rw_0: Int :: { (loc(getVCTOption1(array), k_fresh_rw_0): Ref) } (0 <= 0 ? 1 : 0) <= k_fresh_rw_0 + 1 && k_fresh_rw_0 + 1 < opencl_gsize ==> acc((loc(getVCTOption1(array), k_fresh_rw_0): Ref).Integer__item, 1 / 2))
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+{
+  inhale false
+}
+
+method Ref_loop_body_4_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer(diz: Ref, opencl_gsize: Int, array: VCTOption[VCTArray[Ref]], output: VCTOption[VCTArray[Ref]], size: Int, opencl_gcount: Int, opencl_gid: Int)
+  requires diz != null
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires 0 <= opencl_gid && opencl_gid < opencl_gcount
+  requires (0 <= 0 ? 1 : 0) < opencl_gsize ==> array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires (0 <= 0 ? 1 : 0) <= opencl_gsize - 1 ==> opencl_gsize - 1 - 1 < (alen(getVCTOption1(array)): Int)
+  requires (forall k_fresh_rw_0: Int :: { (loc(getVCTOption1(array), k_fresh_rw_0): Ref) } (0 <= 0 ? 1 : 0) <= k_fresh_rw_0 + 1 && k_fresh_rw_0 + 1 < opencl_gsize ==> acc((loc(getVCTOption1(array), k_fresh_rw_0): Ref).Integer__item, 1 / 2))
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+  ensures 0 <= opencl_gid && opencl_gid < opencl_gcount
+{
+  Ref_parrallel_region_main_2_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz, opencl_gsize, array, output, size, opencl_gcount)
+}
+
+method Ref_parrallel_region_main_1_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz: Ref, opencl_gcount: Int, array: VCTOption[VCTArray[Ref]], output: VCTOption[VCTArray[Ref]], size: Int, opencl_gsize: Int)
+  requires diz != null
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires 0 < opencl_gcount && (0 <= 0 ? 1 : 0) < opencl_gsize ==> array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires 0 < opencl_gcount ==> (0 <= 0 ? 1 : 0) <= opencl_gsize - 1 ==> opencl_gsize - 1 - 1 < (alen(getVCTOption1(array)): Int)
+  requires 0 < opencl_gcount ==> (forall k_fresh_rw_0: Int :: { (loc(getVCTOption1(array), k_fresh_rw_0): Ref) } (0 <= 0 ? 1 : 0) <= k_fresh_rw_0 + 1 && k_fresh_rw_0 + 1 < opencl_gsize ==> acc((loc(getVCTOption1(array), k_fresh_rw_0): Ref).Integer__item, opencl_gcount * (1 / 2)))
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+{
+  inhale false
+}
+
+method Ref_CUDA_Kernel_EncodedGlobalVariables_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer(diz: Ref, globals: Ref, array: VCTOption[VCTArray[Ref]], output: VCTOption[VCTArray[Ref]], size: Int, opencl_gcount: Int, opencl_gsize: Int)
+  requires diz != null
+  requires array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires size == 1024
+  requires opencl_gcount == 1
+  requires opencl_gsize == size
+  requires 0 < opencl_gcount && (0 <= 0 ? 1 : 0) < opencl_gsize ==> array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires 0 < opencl_gcount ==> (0 <= 0 ? 1 : 0) <= opencl_gsize - 1 ==> opencl_gsize - 1 - 1 < (alen(getVCTOption1(array)): Int)
+  requires 0 < opencl_gcount ==> (forall k_fresh_rw_0: Int :: { (loc(getVCTOption1(array), k_fresh_rw_0): Ref) } (0 <= 0 ? 1 : 0) <= k_fresh_rw_0 + 1 && k_fresh_rw_0 + 1 < opencl_gsize ==> acc((loc(getVCTOption1(array), k_fresh_rw_0): Ref).Integer__item, opencl_gcount * (1 / 2)))
+  ensures array != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures output != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures size == 1024
+  ensures opencl_gcount == 1
+  ensures opencl_gsize == size
+{
+  exhale array != (VCTNone(): VCTOption[VCTArray[Ref]]) && output != (VCTNone(): VCTOption[VCTArray[Ref]]) && size == 1024 && opencl_gcount == 1 && opencl_gsize == size && true
+  Ref_parrallel_region_main_1_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz, opencl_gcount, array, output, size, opencl_gsize)
+  inhale array != (VCTNone(): VCTOption[VCTArray[Ref]]) && output != (VCTNone(): VCTOption[VCTArray[Ref]]) && size == 1024 && opencl_gcount == 1 && opencl_gsize == size && true
+}
+
+method Ref_vercorsMallocInt_EncodedGlobalVariables_Integer(diz: Ref, globals: Ref, N: Int) returns (sys__result: VCTOption[VCTArray[Ref]])
+  requires diz != null
+  ensures sys__result != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures N <= (alen(getVCTOption1(sys__result)): Int)
+  ensures (forall __i: Int :: { (loc(getVCTOption1(sys__result), __i): Ref).Integer__item } 0 <= __i && __i < N ==> acc((loc(getVCTOption1(sys__result), __i): Ref).Integer__item, write))
+{
+  inhale false
+}
+
+method Ref_vercorsFreeInt_EncodedGlobalVariables_Option$Array$Cell$Integer$$$(diz: Ref, globals: Ref, ar: VCTOption[VCTArray[Ref]])
+  requires diz != null
+{
+  inhale false
+}
+
+method Ref_vercorsCudaMallocInt_EncodedGlobalVariables_Integer(diz: Ref, globals: Ref, N: Int) returns (sys__result: VCTOption[VCTArray[Ref]])
+  requires diz != null
+  ensures sys__result != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures N <= (alen(getVCTOption1(sys__result)): Int)
+  ensures (forall __i: Int :: { (loc(getVCTOption1(sys__result), __i): Ref).Integer__item } 0 <= __i && __i < N ==> acc((loc(getVCTOption1(sys__result), __i): Ref).Integer__item, write))
+{
+  inhale false
+}
+
+method Ref_vercorsCudaFreeInt_EncodedGlobalVariables_Option$Array$Cell$Integer$$$(diz: Ref, globals: Ref, addr: VCTOption[VCTArray[Ref]])
+  requires diz != null
+{
+  inhale false
+}
+
+method Ref_vercorsCudaMemcpyInt_EncodedGlobalVariables_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz: Ref, globals: Ref, tgt: VCTOption[VCTArray[Ref]], src: VCTOption[VCTArray[Ref]], N: Int, direction: Int)
+  requires diz != null
+  requires src != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires N <= (alen(getVCTOption1(src)): Int)
+  requires (forall __i: Int :: { (loc(getVCTOption1(src), __i): Ref).Integer__item } 0 <= __i && __i < N ==> acc((loc(getVCTOption1(src), __i): Ref).Integer__item, wildcard))
+  requires tgt != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires N <= (alen(getVCTOption1(tgt)): Int)
+  requires (forall __i: Int :: { (loc(getVCTOption1(tgt), __i): Ref).Integer__item } 0 <= __i && __i < N ==> acc((loc(getVCTOption1(tgt), __i): Ref).Integer__item, write))
+  ensures src != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures N <= (alen(getVCTOption1(src)): Int)
+  ensures (forall __i: Int :: { (loc(getVCTOption1(src), __i): Ref).Integer__item } 0 <= __i && __i < N ==> acc((loc(getVCTOption1(src), __i): Ref).Integer__item, wildcard))
+  ensures tgt != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures N <= (alen(getVCTOption1(tgt)): Int)
+  ensures (forall __i: Int :: { (loc(getVCTOption1(tgt), __i): Ref).Integer__item } 0 <= __i && __i < N ==> acc((loc(getVCTOption1(tgt), __i): Ref).Integer__item, write))
+  ensures (forall i: Int :: { (loc(getVCTOption1(src), i): Ref) } { (loc(getVCTOption1(tgt), i): Ref) } 0 <= i && i < N ==> (loc(getVCTOption1(src), i): Ref).Integer__item == (loc(getVCTOption1(tgt), i): Ref).Integer__item)
+{
+  inhale false
+}

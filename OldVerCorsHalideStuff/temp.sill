@@ -1,0 +1,442 @@
+// Generated on 2021-11-09 at 15:24:31
+domain TYPE {
+  
+  unique function class_Ref(): TYPE
+  
+  unique function class_java_DOT_lang_DOT_Object(): TYPE
+  
+  unique function class_EncodedGlobalVariables(): TYPE
+  
+  function directSuperclass(t: TYPE): TYPE
+  
+  function type_of(val: Ref): TYPE
+  
+  axiom Ref_directSuperclass {
+    directSuperclass(class_Ref()) == class_java_DOT_lang_DOT_Object()
+  }
+  
+  axiom EncodedGlobalVariables_directSuperclass {
+    directSuperclass(class_EncodedGlobalVariables()) == class_java_DOT_lang_DOT_Object()
+  }
+}
+
+domain frac {
+  
+  function frac_val(a: frac): Perm
+  
+  axiom frac_eq {
+    (forall a: frac, b: frac :: { frac_val(a),frac_val(b) } (frac_val(a) == frac_val(b)) == (a == b))
+  }
+  
+  axiom frac_bound {
+    (forall a: frac :: { frac_val(a) } 0 / 1 < frac_val(a) && frac_val(a) <= 1 / 1)
+  }
+}
+
+domain zfrac {
+  
+  function zfrac_val(a: zfrac): Perm
+  
+  axiom zfrac_eq {
+    (forall a: zfrac, b: zfrac :: { zfrac_val(a),zfrac_val(b) } (zfrac_val(a) == zfrac_val(b)) == (a == b))
+  }
+  
+  axiom zfrac_bound {
+    (forall a: zfrac :: { zfrac_val(a) } 0 / 1 <= zfrac_val(a) && zfrac_val(a) <= 1 / 1)
+  }
+}
+
+domain VCTArray[CT] {
+  
+  function loc(a: VCTArray[CT], i: Int): CT
+  
+  function alen(a: VCTArray[CT]): Int
+  
+  function second(r: CT): Int
+  
+  axiom good_name_here {
+    (forall a: VCTArray[CT], i: Int :: { (loc(a, i): CT) } (second((loc(a, i): CT)): Int) == (second((loc(a, 0): CT)): Int) + i)
+  }
+  
+  axiom second_injectivity {
+    (forall a: VCTArray[CT], b: VCTArray[CT], i: Int, j: Int :: { (loc(a, i): CT),(loc(b, j): CT) } (second((loc(a, i): CT)): Int) == (second((loc(b, j): CT)): Int) ==> (loc(a, i): CT) == (loc(b, j): CT))
+  }
+  
+  axiom len_nonneg {
+    (forall a: VCTArray[CT] :: { (alen(a): Int) } (alen(a): Int) >= 0)
+  }
+}
+
+domain VCTOption[T] {
+  
+  function VCTNone(): VCTOption[T]
+  
+  function VCTSome(t: T): VCTOption[T]
+  
+  function getVCTOption(o: VCTOption[T]): T
+  
+  axiom not_equal_vct {
+    (forall x: T :: { (VCTSome(x): VCTOption[T]) } (VCTNone(): VCTOption[T]) != (VCTSome(x): VCTOption[T]))
+  }
+  
+  axiom get_axiom_vct {
+    (forall x: T :: { (getVCTOption((VCTSome(x): VCTOption[T])): T) } (getVCTOption((VCTSome(x): VCTOption[T])): T) == x)
+  }
+  
+  axiom get_axiom_vct_2 {
+    (forall x: VCTOption[T] :: { (VCTSome((getVCTOption(x): T)): VCTOption[T]) } (VCTSome((getVCTOption(x): T)): VCTOption[T]) == x)
+  }
+}
+
+//  a field 
+field Integer__item: Int
+
+function Ref_max_Integer_Integer(diz: Ref, a: Int, b: Int): Int
+  requires diz != null
+  ensures a >= b ==> result == a
+  ensures !(a >= b) ==> result == b
+
+
+function Ref_min_Integer_Integer(diz: Ref, a: Int, b: Int): Int
+  requires diz != null
+  ensures a > b ==> result == b
+  ensures !(a > b) ==> result == a
+
+
+function instanceof_TYPE_TYPE(t: TYPE, u: TYPE): Bool
+  requires true
+  ensures result == (t == u || directSuperclass(t) == u)
+
+
+function new_frac(x: Perm): frac
+  requires 0 / 1 < x && x <= 1 / 1
+  ensures frac_val(result) == x
+
+
+function new_zfrac(x: Perm): zfrac
+  requires 0 / 1 <= x && x <= 1 / 1
+  ensures zfrac_val(result) == x
+
+
+function getVCTOption1(x: VCTOption[VCTArray[Ref]]): VCTArray[Ref]
+  requires x != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures true
+{
+  (getVCTOption(x): VCTArray[Ref])
+}
+
+method Ref___contract_unsatisfiable___kernel_even_s0_x_bx___block_id_x_EncodedGlobalVariables_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer(diz: Ref, globals: Ref, _even: VCTOption[VCTArray[Ref]], _in: VCTOption[VCTArray[Ref]], opencl_gcount: Int, opencl_gsize: Int, shared_mem_size_1: Int)
+  requires true
+  requires diz != null
+  ensures true
+  ensures true
+{
+  inhale _even != (VCTNone(): VCTOption[VCTArray[Ref]]) && _in != (VCTNone(): VCTOption[VCTArray[Ref]]) && opencl_gsize == 33 && opencl_gcount == 4 && ((0 < opencl_gcount ==> 0 < opencl_gsize ==> shared_mem_size_1 == 33) && (forall opencl_lid_opencl_gid__1: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid__1): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid__1 % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid__1 && opencl_lid_opencl_gid__1 < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid__1 / 32 * 32, 95) + opencl_lid_opencl_gid__1 % 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid_opencl_gid__1): Ref).Integer__item, wildcard)) && (forall opencl_gid__2: Int :: { (loc(getVCTOption1(_in), opencl_gid__2): Ref) } 0 <= (opencl_gid__2 - 32) / 32 && ((opencl_gid__2 - 32) / 32 < opencl_gcount && (opencl_gid__2 - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid__2 - 32) / 32 * 32, 95) + 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid__2): Ref).Integer__item, wildcard)) && (forall opencl_lid_opencl_gid__3: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid__3): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid__3 % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid__3 && opencl_lid_opencl_gid__3 < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid__3 / 32 * 32, 95) + opencl_lid_opencl_gid__3 % 32 < 128 ==> (loc(getVCTOption1(_in), opencl_lid_opencl_gid__3): Ref).Integer__item % 2 == 0) && (forall opencl_gid__4: Int :: { (loc(getVCTOption1(_in), opencl_gid__4): Ref) } 0 <= (opencl_gid__4 - 32) / 32 && ((opencl_gid__4 - 32) / 32 < opencl_gcount && (opencl_gid__4 - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid__4 - 32) / 32 * 32, 95) + 32 < 128 ==> (loc(getVCTOption1(_in), opencl_gid__4): Ref).Integer__item % 2 == 0) && (forall opencl_lid_opencl_gid__5: Int :: { (loc(getVCTOption1(_even), opencl_lid_opencl_gid__5): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid__5 % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid__5 && opencl_lid_opencl_gid__5 < 32 * opencl_gcount))) && opencl_lid_opencl_gid__5 / 32 * 32 + opencl_lid_opencl_gid__5 % 32 <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid_opencl_gid__5): Ref).Integer__item, 1 / 1)))
+  // assert
+  assert false
+  inhale false
+}
+
+method Ref_barrier_check_3_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer_Option$Array$Cell$Integer$$$(diz: Ref, _even: VCTOption[VCTArray[Ref]], _in: VCTOption[VCTArray[Ref]], opencl_gsize: Int, opencl_gcount: Int, opencl_gid: Int, _in_in_even__0_0: VCTOption[VCTArray[Ref]])
+  requires true
+  requires diz != null
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires |[0..opencl_gsize)| > 0
+  requires 0 <= opencl_gsize - 1 ==> 0 <= 0
+  requires 0 <= opencl_gsize - 1 ==> opencl_gsize - 1 < opencl_gsize
+  requires 0 < opencl_gsize ==> 0 <= opencl_gid
+  requires 0 < opencl_gsize ==> opencl_gid < opencl_gcount
+  requires 0 < opencl_gsize ==> _in_in_even__0_0 != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid && (opencl_lid < opencl_gsize && true) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, 1 / 1))
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid && (opencl_lid < opencl_gsize && true) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item % 2 == 0)
+  ensures true
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures |[0..opencl_gsize)| > 0
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid && (opencl_lid < 32 && (opencl_lid < opencl_gsize && true)) && opencl_gid * 32 + opencl_lid <= 126 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid - 1 && (opencl_lid - 1 < 32 && (opencl_lid - 1 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - 1) <= 126 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid && (opencl_lid < 32 && (opencl_lid < opencl_gsize && true)) && opencl_gid * 32 + opencl_lid <= 126 ==> (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item % 2 == 0)
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid - 1 && (opencl_lid - 1 < 32 && (opencl_lid - 1 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - 1) <= 126 ==> (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item % 2 == 0)
+{
+  
+}
+
+method Ref_barrier_main_3_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer_Integer_Option$Array$Cell$Integer$$$(diz: Ref, _even: VCTOption[VCTArray[Ref]], _in: VCTOption[VCTArray[Ref]], opencl_gsize: Int, opencl_gcount: Int, opencl_lid: Int, opencl_gid: Int, _in_in_even__0_0: VCTOption[VCTArray[Ref]])
+  requires true
+  requires diz != null
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires 0 <= opencl_lid
+  requires opencl_lid < opencl_gsize
+  requires 0 <= opencl_gid
+  requires opencl_gid < opencl_gcount
+  requires _in_in_even__0_0 != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, 1 / 1)
+  requires Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item % 2 == 0
+  ensures true
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, wildcard)
+  ensures opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid + 1): Ref).Integer__item, wildcard)
+  ensures opencl_lid < 32 ==> opencl_gid * 32 + opencl_lid <= 126 ==> (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item % 2 == 0
+  ensures opencl_lid < 32 ==> opencl_gid * 32 + opencl_lid <= 126 ==> (loc(getVCTOption1(_in_in_even__0_0), opencl_lid + 1): Ref).Integer__item % 2 == 0
+{
+  inhale false
+}
+
+method Ref_loop_body_5_Integer_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer(diz: Ref, opencl_gid: Int, opencl_lid: Int, _in: VCTOption[VCTArray[Ref]], _in_in_even__0_0: VCTOption[VCTArray[Ref]], _even: VCTOption[VCTArray[Ref]], opencl_gsize: Int, opencl_gcount: Int, shared_mem_size_1: Int)
+  requires true
+  requires diz != null
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires 0 <= opencl_gid && opencl_gid < opencl_gcount && (0 <= opencl_lid && opencl_lid < opencl_gsize)
+  requires _in_in_even__0_0 != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires shared_mem_size_1 == 33
+  requires Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, 1 / 1)
+  requires opencl_lid < 32 && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + opencl_lid): Ref).Integer__item, wildcard)
+  requires opencl_lid == 32 && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + opencl_lid): Ref).Integer__item, wildcard)
+  requires opencl_lid < 32 && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> (loc(getVCTOption1(_in), opencl_gid * 32 + opencl_lid): Ref).Integer__item % 2 == 0
+  requires opencl_lid == 32 && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> (loc(getVCTOption1(_in), opencl_gid * 32 + opencl_lid): Ref).Integer__item % 2 == 0
+  requires opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> acc((loc(getVCTOption1(_even), opencl_gid * 32 + opencl_lid): Ref).Integer__item, 1 / 1)
+  ensures true
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures 0 <= opencl_gid && opencl_gid < opencl_gcount && (0 <= opencl_lid && opencl_lid < opencl_gsize)
+  ensures opencl_lid < 32 && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + opencl_lid): Ref).Integer__item, wildcard)
+  ensures opencl_lid == 32 && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + opencl_lid): Ref).Integer__item, wildcard)
+  ensures opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> acc((loc(getVCTOption1(_even), opencl_gid * 32 + opencl_lid): Ref).Integer__item, 1 / 1)
+  ensures opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, wildcard)
+  ensures opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid + 1): Ref).Integer__item, wildcard)
+  ensures opencl_lid < 32 ==> opencl_gid * 32 + opencl_lid <= 126 ==> (loc(getVCTOption1(_even), opencl_gid * 32 + opencl_lid): Ref).Integer__item % 2 == 0
+{
+  var _80__31: Int
+  var _79__30: Int
+  var _78__29: Int
+  var _77__28: Int
+  var _76__27: Int
+  var _75__26: Int
+  var _68__16: Int
+  var _67__15: Int
+  var _66__14: Int
+  var _even_s0_x_bx___block_id_x__6: Int
+  var ___thread_id_x__7: Int
+  var _62__8: Int
+  var _63__9: Int
+  var _64__10: Int
+  var _65__11: Bool
+  var __flatten_2__12: Ref
+  var __flatten_3__13: Ref
+  var _69__17: Int
+  var _70__18: Int
+  var _71__19: Int
+  var _72__20: Bool
+  var _73__21: Bool
+  var _74__22: Bool
+  var __flatten_5__23: Ref
+  var __flatten_6__24: Ref
+  var __flatten_7__25: Ref
+  _even_s0_x_bx___block_id_x__6 := opencl_gid
+  ___thread_id_x__7 := opencl_lid
+  _62__8 := _even_s0_x_bx___block_id_x__6 * 32
+  _63__9 := Ref_max_Integer_Integer(diz, _62__8, 95)
+  _64__10 := _63__9 + ___thread_id_x__7
+  _65__11 := _64__10 < 128
+  if (_65__11) {
+    _66__14 := _even_s0_x_bx___block_id_x__6 * 32
+    _67__15 := _66__14 + ___thread_id_x__7
+    __flatten_2__12 := (loc(getVCTOption1(_in), _67__15): Ref)
+    _68__16 := __flatten_2__12.Integer__item
+    __flatten_3__13 := (loc(getVCTOption1(_in_in_even__0_0), ___thread_id_x__7): Ref)
+    __flatten_3__13.Integer__item := _68__16
+  }
+  Ref_barrier_main_3_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer_Integer_Option$Array$Cell$Integer$$$(diz, _even, _in, opencl_gsize, opencl_gcount, opencl_lid, opencl_gid, _in_in_even__0_0)
+  _69__17 := 0
+  _70__18 := _even_s0_x_bx___block_id_x__6 * 32
+  _71__19 := _70__18 + ___thread_id_x__7
+  _72__20 := _71__19 <= 126
+  _73__21 := ___thread_id_x__7 < 32
+  _74__22 := _72__20 && _73__21
+  if (_74__22) {
+    __flatten_5__23 := (loc(getVCTOption1(_in_in_even__0_0), ___thread_id_x__7): Ref)
+    _75__26 := __flatten_5__23.Integer__item
+    _76__27 := ___thread_id_x__7 + 1
+    __flatten_6__24 := (loc(getVCTOption1(_in_in_even__0_0), _76__27): Ref)
+    _77__28 := __flatten_6__24.Integer__item
+    _78__29 := _75__26 + _77__28
+    _79__30 := _even_s0_x_bx___block_id_x__6 * 32
+    _80__31 := _79__30 + ___thread_id_x__7
+    __flatten_7__25 := (loc(getVCTOption1(_even), _80__31): Ref)
+    __flatten_7__25.Integer__item := _78__29
+  }
+}
+
+method Ref_parrallel_region_main_2_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Option$Array$Cell$Integer$$$_Integer_Integer(diz: Ref, opencl_gsize: Int, _even: VCTOption[VCTArray[Ref]], _in: VCTOption[VCTArray[Ref]], opencl_gcount: Int, _in_in_even__0_0: VCTOption[VCTArray[Ref]], shared_mem_size_1: Int, opencl_gid: Int)
+  requires true
+  requires diz != null
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires 0 < opencl_gsize ==> _in_in_even__0_0 != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires 0 < opencl_gsize ==> shared_mem_size_1 == 33
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid && (opencl_lid < opencl_gsize && true) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + opencl_lid < 128 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, 1 / 1))
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + (opencl_lid - opencl_gid * 32) < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, wildcard))
+  requires Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + 32 < 128 && 0 <= 32 && 32 <= opencl_gsize - 1 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + 32): Ref).Integer__item, wildcard)
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + (opencl_lid - opencl_gid * 32) < 128 ==> (loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item % 2 == 0)
+  requires Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + 32 < 128 && 0 <= 32 && 32 <= opencl_gsize - 1 ==> (loc(getVCTOption1(_in), opencl_gid * 32 + 32): Ref).Integer__item % 2 == 0
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_even), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - opencl_gid * 32) <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid): Ref).Integer__item, 1 / 1))
+  ensures true
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + (opencl_lid - opencl_gid * 32) < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, wildcard))
+  ensures Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + 32 < 128 && 0 <= 32 && 32 <= opencl_gsize - 1 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + 32): Ref).Integer__item, wildcard)
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_even), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - opencl_gid * 32) <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid): Ref).Integer__item, 1 / 1))
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid && (opencl_lid < 32 && (opencl_lid < opencl_gsize && true)) && opencl_gid * 32 + opencl_lid <= 126 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref) } 0 <= opencl_lid - 1 && (opencl_lid - 1 < 32 && (opencl_lid - 1 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - 1) <= 126 ==> acc((loc(getVCTOption1(_in_in_even__0_0), opencl_lid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_even), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - opencl_gid * 32) <= 126 ==> (loc(getVCTOption1(_even), opencl_lid): Ref).Integer__item % 2 == 0)
+{
+  inhale false
+}
+
+method Ref_loop_body_4_Integer_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz: Ref, shared_mem_size_1: Int, opencl_gsize: Int, _even: VCTOption[VCTArray[Ref]], _in: VCTOption[VCTArray[Ref]], opencl_gcount: Int, opencl_gid: Int)
+  requires true
+  requires diz != null
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires 0 <= opencl_gid && opencl_gid < opencl_gcount
+  requires 0 < opencl_gsize ==> shared_mem_size_1 == 33
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + (opencl_lid - opencl_gid * 32) < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, wildcard))
+  requires Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + 32 < 128 && 0 <= 32 && 32 <= opencl_gsize - 1 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + 32): Ref).Integer__item, wildcard)
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + (opencl_lid - opencl_gid * 32) < 128 ==> (loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item % 2 == 0)
+  requires Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + 32 < 128 && 0 <= 32 && 32 <= opencl_gsize - 1 ==> (loc(getVCTOption1(_in), opencl_gid * 32 + 32): Ref).Integer__item % 2 == 0
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_even), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - opencl_gid * 32) <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid): Ref).Integer__item, 1 / 1))
+  ensures true
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures 0 <= opencl_gid && opencl_gid < opencl_gcount
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + (opencl_lid - opencl_gid * 32) < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, wildcard))
+  ensures Ref_max_Integer_Integer(diz, opencl_gid * 32, 95) + 32 < 128 && 0 <= 32 && 32 <= opencl_gsize - 1 ==> acc((loc(getVCTOption1(_in), opencl_gid * 32 + 32): Ref).Integer__item, wildcard)
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_even), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - opencl_gid * 32) <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid): Ref).Integer__item, 1 / 1))
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_even), opencl_lid): Ref) } 0 <= opencl_lid - opencl_gid * 32 && (opencl_lid - opencl_gid * 32 < 32 && (opencl_lid - opencl_gid * 32 < opencl_gsize && true)) && opencl_gid * 32 + (opencl_lid - opencl_gid * 32) <= 126 ==> (loc(getVCTOption1(_even), opencl_lid): Ref).Integer__item % 2 == 0)
+{
+  var _in_in_even__0_0__32: VCTOption[VCTArray[Ref]]
+  _in_in_even__0_0__32 := array_new_Option_Array_Cell_Integer____Integer(shared_mem_size_1)
+  Ref_parrallel_region_main_2_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Option$Array$Cell$Integer$$$_Integer_Integer(diz, opencl_gsize, _even, _in, opencl_gcount, _in_in_even__0_0__32, shared_mem_size_1, opencl_gid)
+}
+
+method Ref_parrallel_region_main_1_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz: Ref, opencl_gcount: Int, _even: VCTOption[VCTArray[Ref]], _in: VCTOption[VCTArray[Ref]], opencl_gsize: Int, shared_mem_size_1: Int)
+  requires true
+  requires diz != null
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires 0 < opencl_gcount ==> 0 < opencl_gsize ==> shared_mem_size_1 == 33
+  requires (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid / 32 * 32, 95) + opencl_lid_opencl_gid % 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref).Integer__item, wildcard))
+  requires (forall opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_gid): Ref) } 0 <= (opencl_gid - 32) / 32 && ((opencl_gid - 32) / 32 < opencl_gcount && (opencl_gid - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid - 32) / 32 * 32, 95) + 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid): Ref).Integer__item, wildcard))
+  requires (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid / 32 * 32, 95) + opencl_lid_opencl_gid % 32 < 128 ==> (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref).Integer__item % 2 == 0)
+  requires (forall opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_gid): Ref) } 0 <= (opencl_gid - 32) / 32 && ((opencl_gid - 32) / 32 < opencl_gcount && (opencl_gid - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid - 32) / 32 * 32, 95) + 32 < 128 ==> (loc(getVCTOption1(_in), opencl_gid): Ref).Integer__item % 2 == 0)
+  requires (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && opencl_lid_opencl_gid / 32 * 32 + opencl_lid_opencl_gid % 32 <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref).Integer__item, 1 / 1))
+  ensures true
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid / 32 * 32, 95) + opencl_lid_opencl_gid % 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_gid): Ref) } 0 <= (opencl_gid - 32) / 32 && ((opencl_gid - 32) / 32 < opencl_gcount && (opencl_gid - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid - 32) / 32 * 32, 95) + 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && opencl_lid_opencl_gid / 32 * 32 + opencl_lid_opencl_gid % 32 <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref).Integer__item, 1 / 1))
+  ensures (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && opencl_lid_opencl_gid / 32 * 32 + opencl_lid_opencl_gid % 32 <= 126 ==> (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref).Integer__item % 2 == 0)
+{
+  inhale false
+}
+
+method Ref__kernel_even_s0_x_bx___block_id_x_EncodedGlobalVariables_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer_Integer(diz: Ref, globals: Ref, _even: VCTOption[VCTArray[Ref]], _in: VCTOption[VCTArray[Ref]], opencl_gcount: Int, opencl_gsize: Int, shared_mem_size_1: Int)
+  requires true
+  requires diz != null
+  requires _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires opencl_gsize == 33
+  requires opencl_gcount == 4
+  requires 0 < opencl_gcount ==> 0 < opencl_gsize ==> shared_mem_size_1 == 33
+  requires (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid / 32 * 32, 95) + opencl_lid_opencl_gid % 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref).Integer__item, wildcard))
+  requires (forall opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_gid): Ref) } 0 <= (opencl_gid - 32) / 32 && ((opencl_gid - 32) / 32 < opencl_gcount && (opencl_gid - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid - 32) / 32 * 32, 95) + 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid): Ref).Integer__item, wildcard))
+  requires (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid / 32 * 32, 95) + opencl_lid_opencl_gid % 32 < 128 ==> (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref).Integer__item % 2 == 0)
+  requires (forall opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_gid): Ref) } 0 <= (opencl_gid - 32) / 32 && ((opencl_gid - 32) / 32 < opencl_gcount && (opencl_gid - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid - 32) / 32 * 32, 95) + 32 < 128 ==> (loc(getVCTOption1(_in), opencl_gid): Ref).Integer__item % 2 == 0)
+  requires (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && opencl_lid_opencl_gid / 32 * 32 + opencl_lid_opencl_gid % 32 <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref).Integer__item, 1 / 1))
+  ensures true
+  ensures _even != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures opencl_gsize == 33
+  ensures opencl_gcount == 4
+  ensures (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && Ref_max_Integer_Integer(diz, opencl_lid_opencl_gid / 32 * 32, 95) + opencl_lid_opencl_gid % 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_lid_opencl_gid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_gid: Int :: { (loc(getVCTOption1(_in), opencl_gid): Ref) } 0 <= (opencl_gid - 32) / 32 && ((opencl_gid - 32) / 32 < opencl_gcount && (opencl_gid - 32) % 32 == 0) && 0 <= 32 && 32 <= opencl_gsize - 1 && Ref_max_Integer_Integer(diz, (opencl_gid - 32) / 32 * 32, 95) + 32 < 128 ==> acc((loc(getVCTOption1(_in), opencl_gid): Ref).Integer__item, wildcard))
+  ensures (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && opencl_lid_opencl_gid / 32 * 32 + opencl_lid_opencl_gid % 32 <= 126 ==> acc((loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref).Integer__item, 1 / 1))
+  ensures (forall opencl_lid_opencl_gid: Int :: { (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref) } 0 < opencl_gcount && (0 < 32 && (opencl_lid_opencl_gid % 32 < opencl_gsize && (0 <= opencl_lid_opencl_gid && opencl_lid_opencl_gid < 32 * opencl_gcount))) && opencl_lid_opencl_gid / 32 * 32 + opencl_lid_opencl_gid % 32 <= 126 ==> (loc(getVCTOption1(_even), opencl_lid_opencl_gid): Ref).Integer__item % 2 == 0)
+{
+  exhale _even != (VCTNone(): VCTOption[VCTArray[Ref]]) && _in != (VCTNone(): VCTOption[VCTArray[Ref]]) && opencl_gsize == 33 && opencl_gcount == 4 && true
+  Ref_parrallel_region_main_1_Integer_Option$Array$Cell$Integer$$$_Option$Array$Cell$Integer$$$_Integer_Integer(diz, opencl_gcount, _even, _in, opencl_gsize, shared_mem_size_1)
+  inhale _even != (VCTNone(): VCTOption[VCTArray[Ref]]) && _in != (VCTNone(): VCTOption[VCTArray[Ref]]) && opencl_gsize == 33 && opencl_gcount == 4 && true
+}
+
+method array_new_Option_Array_Cell_Integer____Integer(size0: Int) returns (sys__result: VCTOption[VCTArray[Ref]])
+  requires true
+  requires true
+  ensures true
+  ensures sys__result != (VCTNone(): VCTOption[VCTArray[Ref]])
+  ensures (alen(getVCTOption1(sys__result)): Int) == size0
+  ensures (forall i0: Int :: { (loc(getVCTOption1(sys__result), i0): Ref).Integer__item } 0 <= i0 && i0 < size0 ==> acc((loc(getVCTOption1(sys__result), i0): Ref).Integer__item, write))
+  ensures (forall i0: Int :: { (loc(getVCTOption1(sys__result), i0): Ref).Integer__item } 0 <= i0 && i0 < size0 ==> (loc(getVCTOption1(sys__result), i0): Ref).Integer__item == 0)
+{
+  inhale false
+}

@@ -1,0 +1,1210 @@
+domain WellFoundedOrder[T] {
+  
+  function bounded(v: T): Bool
+  
+  function decreasing(v1: T, v2: T): Bool
+}
+
+domain IntOrder {
+  
+  axiom {
+    (forall i: Int ::0 <= i == (bounded(i): Bool))
+  }
+  
+  axiom {
+    (forall i: Int ::(forall j: Int ::i < j == (decreasing(i, j): Bool)))
+  }
+}
+
+domain array {
+  
+  function array_loc(a: array, i: Int): Ref
+  
+  function alen(a: array): Int
+  
+  function loc_inv_1(loc: Ref): array
+  
+  function loc_inv_2(loc: Ref): Int
+  
+  axiom {
+    (forall a: array, i: Int ::
+      { array_loc(a, i) }
+      loc_inv_1(array_loc(a, i)) == a && loc_inv_2(array_loc(a, i)) == i)
+  }
+  
+  axiom {
+    (forall a: array :: { alen(a) } alen(a) >= 0)
+  }
+}
+
+domain any {
+  
+  
+}
+
+domain option[T1] {
+  
+  function None(): option[T1]
+  
+  function some(x: T1): option[T1]
+  
+  function option_get(opt: option[T1]): T1
+  
+  axiom {
+    (forall x: T1 ::
+      { (some(x): option[T1]) }
+      (None(): option[T1]) != (some(x): option[T1]))
+  }
+  
+  axiom {
+    (forall x: T1 ::
+      { (some(x): option[T1]) }
+      (option_get((some(x): option[T1])): T1) == x)
+  }
+  
+  axiom {
+    (forall opt: option[T1] ::
+      { (some((option_get(opt): T1)): option[T1]) }
+      (some((option_get(opt): T1)): option[T1]) == opt)
+  }
+}
+
+field min_01: Int
+
+field extent_0: Int
+
+field extent_4: Int
+
+field extent_2: Int
+
+field min_4: Int
+
+field stride_0: Int
+
+field min_1: Int
+
+field stride_2: Int
+
+field stride_01: Int
+
+field stride_3: Int
+
+field min_3: Int
+
+field stride_4: Int
+
+field min_0: Int
+
+field host1: option[array]
+
+field stride_1: Int
+
+field int: Int
+
+field extent_3: Int
+
+field min_2: Int
+
+field host: option[array]
+
+field extent_01: Int
+
+field extent_1: Int
+
+function max(x: Int, y: Int): Int
+{
+  (y < x ? x : y)
+}
+
+function min(x: Int, y: Int): Int
+{
+  (y < x ? y : x)
+}
+
+function max1(x: Perm, y: Perm): Perm
+{
+  (y < x ? x : y)
+}
+
+function min1(x: Perm, y: Perm): Perm
+{
+  (y < x ? y : x)
+}
+
+function abs(x: Int): Int
+{
+  (0 < x ? x : -x)
+}
+
+function int_to_float(x: Int): Perm
+
+
+function float_to_int(x: Perm): Int
+
+
+function aloc(a: array, i: Int): Ref
+  decreases
+  requires 0 <= i
+  requires i < alen(a) 
+  ensures loc_inv_1(result) == a
+  ensures loc_inv_2(result) == i
+{
+  array_loc(a, i)
+}
+
+function any_as(t: any): any
+  decreases 
+
+
+function as_any(t: any): any
+  decreases 
+  ensures any_as(result) == t
+
+
+function opt_get(opt: option[any]): any
+  decreases
+  requires opt != (None(): option[any])
+  ensures (some(result): option[any]) == opt
+{
+  (option_get(opt): any)
+}
+
+function opt_or_else(opt: option[any], alt: any): any
+  decreases 
+  ensures opt == (None(): option[any]) ==> result == alt
+  ensures opt != (None(): option[any]) ==> result == opt_get(opt)
+{
+  (opt == (None(): option[any]) ? alt : opt_get(opt))
+}
+
+function _halide_buffer_get_host(b: Ref): option[array]
+  requires acc(b.host, wildcard)
+{
+  b.host
+}
+
+function _halide_buffer_get_min(b: Ref, dim: Int): Int
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.min_0, wildcard)
+  requires dim == 1 ==> acc(b.min_1, wildcard)
+  requires dim == 2 ==> acc(b.min_2, wildcard)
+{
+  (dim == 0 ? b.min_0 : (dim == 1 ? b.min_1 : b.min_2))
+}
+
+function _halide_buffer_get_stride(b: Ref, dim: Int): Int
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.stride_0, wildcard)
+  requires dim == 1 ==> acc(b.stride_1, wildcard)
+  requires dim == 2 ==> acc(b.stride_2, wildcard)
+{
+  (dim == 0 ? b.stride_0 : (dim == 1 ? b.stride_1 : b.stride_2))
+}
+
+function _halide_buffer_get_extent(b: Ref, dim: Int): Int
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.extent_0, wildcard)
+  requires dim == 1 ==> acc(b.extent_1, wildcard)
+  requires dim == 2 ==> acc(b.extent_2, wildcard)
+{
+  (dim == 0 ? b.extent_0 : (dim == 1 ? b.extent_1 : b.extent_2))
+}
+
+function _halide_buffer_get_host1(b: Ref): option[array]
+  requires acc(b.host1, wildcard)
+{
+  b.host1
+}
+
+function _halide_buffer_get_min1(b: Ref, dim: Int): Int
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.min_01, wildcard)
+  requires dim == 1 ==> acc(b.min_3, wildcard)
+  requires dim == 2 ==> acc(b.min_4, wildcard)
+{
+  (dim == 0 ? b.min_01 : (dim == 1 ? b.min_3 : b.min_4))
+}
+
+function _halide_buffer_get_stride1(b: Ref, dim: Int): Int
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.stride_01, wildcard)
+  requires dim == 1 ==> acc(b.stride_3, wildcard)
+  requires dim == 2 ==> acc(b.stride_4, wildcard)
+{
+  (dim == 0 ? b.stride_01 : (dim == 1 ? b.stride_3 : b.stride_4))
+}
+
+function _halide_buffer_get_extent1(b: Ref, dim: Int): Int
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.extent_01, wildcard)
+  requires dim == 1 ==> acc(b.extent_3, wildcard)
+  requires dim == 2 ==> acc(b.extent_4, wildcard)
+{
+  (dim == 0 ? b.extent_01 : (dim == 1 ? b.extent_3 : b.extent_4))
+}
+
+function opt_get1(opt: option[array]): array
+  decreases
+  requires opt != (None(): option[array])
+  ensures (some(result): option[array]) == opt
+{
+  (option_get(opt): array)
+}
+
+function scale(amount: Perm): Perm
+  requires amount >= 0 * write
+  decreases 
+{
+  amount
+}
+
+function type(type1: Ref): Int
+  decreases 
+  ensures result >= 0
+  ensures result <= 2
+  ensures type1 == null ==> result == 0
+  ensures type1 != null ==> result != 0
+
+
+function subtype(subtype1: Int, subtype2: Int): Bool
+  requires subtype1 >= 0
+  requires subtype1 <= 2
+  requires subtype2 >= 0
+  requires subtype2 <= 2
+  decreases 
+{
+  (subtype1 == 0 ==> true) &&
+  ((subtype1 == 1 ==> subtype2 == 1) && (subtype1 == 2 ==> subtype2 == 2))
+}
+
+method check_sat_max()
+{
+  assert false
+}
+
+method check_sat_min()
+{
+  assert false
+}
+
+method check_sat_max1()
+{
+  assert false
+}
+
+method check_sat_min1()
+{
+  assert false
+}
+
+method check_sat_abs()
+{
+  assert false
+}
+
+method check_sat_int_to_float()
+{
+  assert false
+}
+
+method check_sat_float_to_int()
+{
+  assert false
+}
+
+method check_sat_halide_buffer_int()
+{
+  assert false
+}
+
+method halide_buffer_int(tid: Int) returns (res: Ref)
+  ensures acc(res.host, write)
+  ensures acc(res.min_0, write)
+  ensures acc(res.min_1, write)
+  ensures acc(res.min_2, write)
+  ensures acc(res.extent_0, write)
+  ensures acc(res.extent_1, write)
+  ensures acc(res.extent_2, write)
+  ensures acc(res.stride_0, write)
+  ensures acc(res.stride_1, write)
+  ensures acc(res.stride_2, write)
+{
+  var exc: Ref
+  var return: Ref
+  var halide_buffer_int1: Ref
+  var flatten: Ref
+  exc := null
+  flatten := new(host, min_0, min_1, min_2, extent_0, extent_1, extent_2, stride_0, stride_1, stride_2)
+  inhale type(flatten) == 1
+  halide_buffer_int1 := flatten
+  return := halide_buffer_int1
+  goto end
+  label end
+  res := return
+  label bubble
+  assert exc == null
+}
+
+method check_sat__halide_buffer_get_host(b: Ref)
+  requires acc(b.host, wildcard)
+{
+  assert false
+}
+
+method check_sat__halide_buffer_get_min(dim: Int, b: Ref)
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.min_0, wildcard)
+  requires dim == 1 ==> acc(b.min_1, wildcard)
+  requires dim == 2 ==> acc(b.min_2, wildcard)
+{
+  assert false
+}
+
+method check_sat__halide_buffer_get_stride(dim: Int, b: Ref)
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.stride_0, wildcard)
+  requires dim == 1 ==> acc(b.stride_1, wildcard)
+  requires dim == 2 ==> acc(b.stride_2, wildcard)
+{
+  assert false
+}
+
+method check_sat__halide_buffer_get_extent(b: Ref, dim: Int)
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.extent_0, wildcard)
+  requires dim == 1 ==> acc(b.extent_1, wildcard)
+  requires dim == 2 ==> acc(b.extent_2, wildcard)
+{
+  assert false
+}
+
+method check_sat_halide_buffer_rational()
+{
+  assert false
+}
+
+method halide_buffer_rational(tid: Int) returns (res: Ref)
+  ensures acc(res.host1, write)
+  ensures acc(res.min_01, write)
+  ensures acc(res.min_3, write)
+  ensures acc(res.min_4, write)
+  ensures acc(res.extent_01, write)
+  ensures acc(res.extent_3, write)
+  ensures acc(res.extent_4, write)
+  ensures acc(res.stride_01, write)
+  ensures acc(res.stride_3, write)
+  ensures acc(res.stride_4, write)
+{
+  var exc: Ref
+  var return: Ref
+  var halide_buffer_rational1: Ref
+  var flatten: Ref
+  exc := null
+  flatten := new(host1, min_01, min_3, min_4, extent_01, extent_3, extent_4, stride_01, stride_3, stride_4)
+  inhale type(flatten) == 2
+  halide_buffer_rational1 := flatten
+  return := halide_buffer_rational1
+  goto end
+  label end
+  res := return
+  label bubble
+  assert exc == null
+}
+
+method check_sat__halide_buffer_get_host1(b: Ref)
+  requires acc(b.host1, wildcard)
+{
+  assert false
+}
+
+method check_sat__halide_buffer_get_min1(b: Ref, dim: Int)
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.min_01, wildcard)
+  requires dim == 1 ==> acc(b.min_3, wildcard)
+  requires dim == 2 ==> acc(b.min_4, wildcard)
+{
+  assert false
+}
+
+method check_sat__halide_buffer_get_stride1(dim: Int, b: Ref)
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.stride_01, wildcard)
+  requires dim == 1 ==> acc(b.stride_3, wildcard)
+  requires dim == 2 ==> acc(b.stride_4, wildcard)
+{
+  assert false
+}
+
+method check_sat__halide_buffer_get_extent1(b: Ref, dim: Int)
+  requires 0 <= dim
+  requires dim < 3
+  requires dim == 0 ==> acc(b.extent_01, wildcard)
+  requires dim == 1 ==> acc(b.extent_3, wildcard)
+  requires dim == 2 ==> acc(b.extent_4, wildcard)
+{
+  assert false
+}
+
+method check_sat_make_array()
+{
+  assert false
+}
+
+method make_array(tid: Int, dim0: Int) returns (res: option[array])
+  ensures res != (None(): option[array])
+  ensures alen(opt_get1(res)) == dim0
+  ensures (forall i0: Int ::
+      { aloc(opt_get1(res), i0).int }
+      0 <= i0 && i0 < dim0 ==> acc(aloc(opt_get1(res), i0).int, write))
+  ensures (forall i0: Int ::
+      { aloc(opt_get1(res), i0).int }
+      true ==> 0 <= i0 && i0 < dim0 ==> aloc(opt_get1(res), i0).int == 0)
+
+
+method check_sat_blur(_blur_y_buffer: Ref, _inp_buffer: Ref)
+  requires acc(_inp_buffer.host, wildcard)
+  requires _inp_buffer.host != (None(): option[array])
+  requires acc(_inp_buffer.min_0, wildcard)
+  requires acc(_inp_buffer.stride_0, wildcard)
+  requires acc(_inp_buffer.extent_0, wildcard)
+  requires acc(_inp_buffer.min_1, wildcard)
+  requires acc(_inp_buffer.stride_1, wildcard)
+  requires acc(_inp_buffer.extent_1, wildcard)
+  requires acc(_inp_buffer.host, wildcard)
+  requires _inp_buffer.host != (None(): option[array])
+  requires alen(opt_get1(_inp_buffer.host)) ==
+    1 + abs(_inp_buffer.stride_0) * (_inp_buffer.extent_0 - 1) +
+    abs(_inp_buffer.stride_1) * (_inp_buffer.extent_1 - 1)
+  requires acc(_blur_y_buffer.host, wildcard)
+  requires _blur_y_buffer.host != (None(): option[array])
+  requires acc(_blur_y_buffer.min_0, wildcard)
+  requires acc(_blur_y_buffer.stride_0, wildcard)
+  requires acc(_blur_y_buffer.extent_0, wildcard)
+  requires acc(_blur_y_buffer.min_1, wildcard)
+  requires acc(_blur_y_buffer.stride_1, wildcard)
+  requires acc(_blur_y_buffer.extent_1, wildcard)
+  requires acc(_blur_y_buffer.host, wildcard)
+  requires _blur_y_buffer.host != (None(): option[array])
+  requires alen(opt_get1(_blur_y_buffer.host)) ==
+    1 + abs(_blur_y_buffer.stride_0) * (_blur_y_buffer.extent_0 - 1) +
+    abs(_blur_y_buffer.stride_1) * (_blur_y_buffer.extent_1 - 1)
+  requires _inp_buffer.min_0 == 0
+  requires _inp_buffer.extent_0 == 1026
+  requires _inp_buffer.stride_0 == 1
+  requires _inp_buffer.min_1 == 0
+  requires _inp_buffer.extent_1 == 1026
+  requires _inp_buffer.stride_1 == 1026
+  requires (forall _0__1: Int ::
+      { aloc(opt_get1(_inp_buffer.host), _0__1).int }
+      0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+      acc(aloc(opt_get1(_inp_buffer.host), _0__1).int, wildcard))
+  requires _blur_y_buffer.min_0 == 1
+  requires _blur_y_buffer.extent_0 == 1024
+  requires _blur_y_buffer.stride_0 == 1
+  requires _blur_y_buffer.min_1 == 1
+  requires _blur_y_buffer.extent_1 == 1024
+  requires _blur_y_buffer.stride_1 == 1024
+  requires (forall _0__1: Int ::
+      { aloc(opt_get1(_blur_y_buffer.host), _0__1).int }
+      0 <= _0__1 && _0__1 < 1024 * 1024 ==>
+      acc(aloc(opt_get1(_blur_y_buffer.host), _0__1).int, 1 * write))
+{
+  assert false
+}
+
+method blur(tid: Int, _inp_buffer: Ref, _blur_y_buffer: Ref)
+  returns (res: Int)
+  requires acc(_inp_buffer.host, wildcard)
+  requires _inp_buffer.host != (None(): option[array])
+  requires acc(_inp_buffer.min_0, wildcard)
+  requires acc(_inp_buffer.stride_0, wildcard)
+  requires acc(_inp_buffer.extent_0, wildcard)
+  requires acc(_inp_buffer.min_1, wildcard)
+  requires acc(_inp_buffer.stride_1, wildcard)
+  requires acc(_inp_buffer.extent_1, wildcard)
+  requires acc(_inp_buffer.host, wildcard)
+  requires _inp_buffer.host != (None(): option[array])
+  requires alen(opt_get1(_inp_buffer.host)) ==
+    1 + abs(_inp_buffer.stride_0) * (_inp_buffer.extent_0 - 1) +
+    abs(_inp_buffer.stride_1) * (_inp_buffer.extent_1 - 1)
+  requires acc(_blur_y_buffer.host, wildcard)
+  requires _blur_y_buffer.host != (None(): option[array])
+  requires acc(_blur_y_buffer.min_0, wildcard)
+  requires acc(_blur_y_buffer.stride_0, wildcard)
+  requires acc(_blur_y_buffer.extent_0, wildcard)
+  requires acc(_blur_y_buffer.min_1, wildcard)
+  requires acc(_blur_y_buffer.stride_1, wildcard)
+  requires acc(_blur_y_buffer.extent_1, wildcard)
+  requires acc(_blur_y_buffer.host, wildcard)
+  requires _blur_y_buffer.host != (None(): option[array])
+  requires alen(opt_get1(_blur_y_buffer.host)) ==
+    1 + abs(_blur_y_buffer.stride_0) * (_blur_y_buffer.extent_0 - 1) +
+    abs(_blur_y_buffer.stride_1) * (_blur_y_buffer.extent_1 - 1)
+  requires _inp_buffer.min_0 == 0
+  requires _inp_buffer.extent_0 == 1026
+  requires _inp_buffer.stride_0 == 1
+  requires _inp_buffer.min_1 == 0
+  requires _inp_buffer.extent_1 == 1026
+  requires _inp_buffer.stride_1 == 1026
+  requires (forall _0__1: Int ::
+      { aloc(opt_get1(_inp_buffer.host), _0__1).int }
+      0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+      acc(aloc(opt_get1(_inp_buffer.host), _0__1).int, wildcard))
+  requires _blur_y_buffer.min_0 == 1
+  requires _blur_y_buffer.extent_0 == 1024
+  requires _blur_y_buffer.stride_0 == 1
+  requires _blur_y_buffer.min_1 == 1
+  requires _blur_y_buffer.extent_1 == 1024
+  requires _blur_y_buffer.stride_1 == 1024
+  requires (forall _0__1: Int ::
+      { aloc(opt_get1(_blur_y_buffer.host), _0__1).int }
+      0 <= _0__1 && _0__1 < 1024 * 1024 ==>
+      acc(aloc(opt_get1(_blur_y_buffer.host), _0__1).int, 1 * write))
+  ensures acc(_inp_buffer.host, wildcard)
+  ensures _inp_buffer.host != (None(): option[array])
+  ensures acc(_inp_buffer.min_0, wildcard)
+  ensures acc(_inp_buffer.stride_0, wildcard)
+  ensures acc(_inp_buffer.extent_0, wildcard)
+  ensures acc(_inp_buffer.min_1, wildcard)
+  ensures acc(_inp_buffer.stride_1, wildcard)
+  ensures acc(_inp_buffer.extent_1, wildcard)
+  ensures acc(_inp_buffer.host, wildcard)
+  ensures _inp_buffer.host != (None(): option[array])
+  ensures alen(opt_get1(_inp_buffer.host)) ==
+    1 + abs(_inp_buffer.stride_0) * (_inp_buffer.extent_0 - 1) +
+    abs(_inp_buffer.stride_1) * (_inp_buffer.extent_1 - 1)
+  ensures acc(_blur_y_buffer.host, wildcard)
+  ensures _blur_y_buffer.host != (None(): option[array])
+  ensures acc(_blur_y_buffer.min_0, wildcard)
+  ensures acc(_blur_y_buffer.stride_0, wildcard)
+  ensures acc(_blur_y_buffer.extent_0, wildcard)
+  ensures acc(_blur_y_buffer.min_1, wildcard)
+  ensures acc(_blur_y_buffer.stride_1, wildcard)
+  ensures acc(_blur_y_buffer.extent_1, wildcard)
+  ensures acc(_blur_y_buffer.host, wildcard)
+  ensures _blur_y_buffer.host != (None(): option[array])
+  ensures alen(opt_get1(_blur_y_buffer.host)) ==
+    1 + abs(_blur_y_buffer.stride_0) * (_blur_y_buffer.extent_0 - 1) +
+    abs(_blur_y_buffer.stride_1) * (_blur_y_buffer.extent_1 - 1)
+  ensures _inp_buffer.min_0 == 0
+  ensures _inp_buffer.extent_0 == 1026
+  ensures _inp_buffer.stride_0 == 1
+  ensures _inp_buffer.min_1 == 0
+  ensures _inp_buffer.extent_1 == 1026
+  ensures _inp_buffer.stride_1 == 1026
+  ensures (forall _0__1: Int ::
+      { aloc(opt_get1(_inp_buffer.host), _0__1).int }
+      0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+      acc(aloc(opt_get1(_inp_buffer.host), _0__1).int, wildcard))
+  ensures _blur_y_buffer.min_0 == 1
+  ensures _blur_y_buffer.extent_0 == 1024
+  ensures _blur_y_buffer.stride_0 == 1
+  ensures _blur_y_buffer.min_1 == 1
+  ensures _blur_y_buffer.extent_1 == 1024
+  ensures _blur_y_buffer.stride_1 == 1024
+  ensures (forall _0__1: Int ::
+      { aloc(opt_get1(_blur_y_buffer.host), _0__1).int }
+      0 <= _0__1 && _0__1 < 1024 * 1024 ==>
+      acc(aloc(opt_get1(_blur_y_buffer.host), _0__1).int, 1 * write))
+{
+  var exc: Ref
+  var return: Int
+  var _blur_y: option[array]
+  var _blur_y_min_0: Int
+  var _blur_y_extent_0: Int
+  var _blur_y_stride_0: Int
+  var _blur_y_min_1: Int
+  var _blur_y_extent_1: Int
+  var _blur_y_stride_1: Int
+  var _inp: option[array]
+  var _inp_min_0: Int
+  var _inp_extent_0: Int
+  var _inp_stride_0: Int
+  var _inp_min_1: Int
+  var _inp_extent_1: Int
+  var _inp_stride_1: Int
+  var lo__blur_y_s0_y_y: Int
+  var _blur_y_s0_y_y_hi: Int
+  var _blur_y_s0_y_y: Int
+  var _blur_x: option[array]
+  var _t34: Int
+  var _blur_y_s0_y_yi: Int
+  var _t35: Int
+  var _blur_x_s0_y: Int
+  var _t37: Int
+  var _t36: Int
+  var _blur_x_s0_x_x: Int
+  var _t25: Int
+  var _t39: Int
+  var _t38: Int
+  var _blur_y_s0_x_x: Int
+  var _t26: Int
+  var _t27: Int
+  var _t28: Int
+  var _t29: Int
+  var _t30: Int
+  var _t31: Int
+  var _t32: Int
+  var _t33: Int
+  var indet: Int
+  var indet1: Int
+  var indet2: Int
+  var once: Bool
+  var flatten: option[array]
+  var flatten1: Int
+  var flatten2: Int
+  var flatten3: Int
+  var flatten4: Int
+  var flatten5: Int
+  var flatten6: Int
+  var flatten7: option[array]
+  var flatten8: Int
+  var flatten9: Int
+  var flatten10: Int
+  var flatten11: Int
+  var flatten12: Int
+  var flatten13: Int
+  var flatten14: Int
+  var flatten15: Int
+  var flatten16: Bool
+  var flatten17: Bool
+  var res1: option[array]
+  var flatten18: option[array]
+  var flatten19: Int
+  var flatten20: Int
+  var flatten21: Int
+  var flatten22: Int
+  var flatten23: Int
+  var flatten24: Int
+  var flatten25: Int
+  var flatten26: Int
+  var flatten27: Int
+  var flatten28: Int
+  var flatten29: Int
+  var flatten30: Int
+  var flatten31: Int
+  var flatten32: Int
+  var flatten33: Int
+  var flatten34: Int
+  var flatten35: Int
+  var flatten36: Int
+  var flatten37: Int
+  var flatten38: Int
+  var flatten39: Int
+  var flatten40: Int
+  var flatten41: Int
+  var flatten42: Int
+  var flatten43: Int
+  var flatten44: Int
+  var flatten45: Int
+  var flatten46: Int
+  var flatten47: Int
+  var flatten48: Int
+  var flatten49: Int
+  var flatten50: Int
+  var flatten51: Int
+  var flatten52: Int
+  var flatten53: Int
+  var flatten54: Int
+  var flatten55: Int
+  var flatten56: Int
+  var flatten57: Int
+  var flatten58: Int
+  var flatten59: Int
+  var flatten60: Int
+  var flatten61: Int
+  var flatten62: Int
+  var flatten63: Int
+  var flatten64: Int
+  var flatten65: Int
+  var flatten66: Int
+  var flatten67: Int
+  var flatten68: Int
+  var flatten69: Int
+  var flatten70: Int
+  var flatten71: Int
+  var flatten72: Int
+  var flatten73: Int
+  var excBeforeLoop: Ref
+  var excBeforeLoop1: Ref
+  var excBeforeLoop2: Ref
+  var excBeforeLoop3: Ref
+  var excBeforeLoop4: Ref
+  exc := null
+  flatten := _halide_buffer_get_host(_blur_y_buffer)
+  _blur_y := flatten
+  flatten1 := _halide_buffer_get_min(_blur_y_buffer, 0)
+  _blur_y_min_0 := flatten1
+  flatten2 := _halide_buffer_get_extent(_blur_y_buffer, 0)
+  _blur_y_extent_0 := flatten2
+  flatten3 := _halide_buffer_get_stride(_blur_y_buffer, 0)
+  _blur_y_stride_0 := flatten3
+  flatten4 := _halide_buffer_get_min(_blur_y_buffer, 1)
+  _blur_y_min_1 := flatten4
+  flatten5 := _halide_buffer_get_extent(_blur_y_buffer, 1)
+  _blur_y_extent_1 := flatten5
+  flatten6 := _halide_buffer_get_stride(_blur_y_buffer, 1)
+  _blur_y_stride_1 := flatten6
+  flatten7 := _halide_buffer_get_host(_inp_buffer)
+  _inp := flatten7
+  flatten8 := _halide_buffer_get_min(_inp_buffer, 0)
+  _inp_min_0 := flatten8
+  flatten9 := _halide_buffer_get_extent(_inp_buffer, 0)
+  _inp_extent_0 := flatten9
+  flatten10 := _halide_buffer_get_stride(_inp_buffer, 0)
+  _inp_stride_0 := flatten10
+  flatten11 := _halide_buffer_get_min(_inp_buffer, 1)
+  _inp_min_1 := flatten11
+  flatten12 := _halide_buffer_get_extent(_inp_buffer, 1)
+  _inp_extent_1 := flatten12
+  flatten13 := _halide_buffer_get_stride(_inp_buffer, 1)
+  _inp_stride_1 := flatten13
+  flatten14 := 0
+  lo__blur_y_s0_y_y := flatten14
+  flatten15 := 128
+  _blur_y_s0_y_y_hi := flatten15
+  inhale indet >= 0
+  inhale indet < 2
+  if (indet == 0) {
+    exhale (0 < 128 ==>
+      (forall _0__1: Int ::
+        { aloc(opt_get1(_inp), _0__1).int }
+        0 <= _0__1 && _0__1 < 1026 * 1026 && scale(128 * write) > none ==>
+        acc(aloc(opt_get1(_inp), _0__1).int, wildcard))) &&
+      (forall _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y: Int ::
+        { aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y).int }
+        0 <=
+        _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y &&
+        _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y <
+        1024 * 8 * 128 ==>
+        acc(aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y).int, 1 *
+        write))
+    inhale (0 < 128 ==>
+      (forall _0__1: Int ::
+        { aloc(opt_get1(_inp), _0__1).int }
+        0 <= _0__1 && _0__1 < 1026 * 1026 && scale(128 * write) > none ==>
+        acc(aloc(opt_get1(_inp), _0__1).int, wildcard))) &&
+      (forall _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y: Int ::
+        { aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y).int }
+        0 <=
+        _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y &&
+        _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y <
+        1024 * 8 * 128 ==>
+        acc(aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall__blur_y_s0_y_y).int, 1 *
+        write))
+  } elseif (indet == 1) {
+    inhale indet1 >= 0
+    inhale indet1 < 1
+    if (indet1 == 0) {
+      inhale indet2 >= 0
+      inhale indet2 < 128
+      _blur_y_s0_y_y := indet2
+      excBeforeLoop := exc
+      flatten16 := true
+      once := flatten16
+      while (once)
+        invariant exc == excBeforeLoop
+        invariant once ==>
+          0 <= _blur_y_s0_y_y && _blur_y_s0_y_y < 128 &&
+          (forall _0__1: Int ::
+            { aloc(opt_get1(_inp), _0__1).int }
+            0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+            acc(aloc(opt_get1(_inp), _0__1).int, wildcard)) &&
+          (forall _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall: Int ::
+            { aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall).int }
+            0 <=
+            _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall -
+            1024 * (_blur_y_s0_y_y * 8) &&
+            _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall -
+            1024 * (_blur_y_s0_y_y * 8) <
+            1024 * 8 ==>
+            acc(aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall).int, 1 *
+            write))
+        invariant !once ==>
+          0 <= _blur_y_s0_y_y && _blur_y_s0_y_y < 128 &&
+          (forall _0__1: Int ::
+            { aloc(opt_get1(_inp), _0__1).int }
+            0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+            acc(aloc(opt_get1(_inp), _0__1).int, wildcard)) &&
+          (forall _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall: Int ::
+            { aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall).int }
+            0 <=
+            _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall -
+            1024 * (_blur_y_s0_y_y * 8) &&
+            _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall -
+            1024 * (_blur_y_s0_y_y * 8) <
+            1024 * 8 ==>
+            acc(aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall).int, 1 *
+            write)) 
+      {
+        res1 := make_array(tid, 1024 * 10)
+        flatten18 := res1
+        _blur_x := flatten18
+        flatten19 := _blur_y_s0_y_y * 8
+        _t34 := flatten19
+        label loop
+        excBeforeLoop1 := exc
+        flatten20 := 0
+        _blur_y_s0_y_yi := flatten20
+        while (_blur_y_s0_y_yi < 8)
+          invariant exc == excBeforeLoop1
+          invariant 0 <= _blur_y_s0_y_yi
+          invariant _blur_y_s0_y_yi < 8 + 1
+          invariant (forall _0__1: Int ::
+              { aloc(opt_get1(_inp), _0__1).int }
+              0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+              acc(aloc(opt_get1(_inp), _0__1).int, wildcard))
+          invariant (forall _x__y: Int ::
+              { aloc(opt_get1(_blur_x), _x__y).int }
+              0 <=
+              _x__y -
+              (-1 - 1024 * (_blur_y_s0_y_y * 8) + 1 +
+              1024 * (_blur_y_s0_y_y * 8)) &&
+              _x__y -
+              (-1 - 1024 * (_blur_y_s0_y_y * 8) + 1 +
+              1024 * (_blur_y_s0_y_y * 8)) <
+              1024 * 10 ==>
+              acc(aloc(opt_get1(_blur_x), _x__y).int, 1 * write))
+          invariant (forall _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall: Int ::
+              { aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall).int }
+              0 <=
+              _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall -
+              1024 * (_blur_y_s0_y_y * 8) &&
+              _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall -
+              1024 * (_blur_y_s0_y_y * 8) <
+              1024 * 8 ==>
+              acc(aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall__blur_y_s0_y_yi_forall).int, 1 *
+              write)) 
+        {
+          flatten22 := _blur_y_s0_y_yi + _t34
+          _t35 := flatten22
+          label loop1
+          excBeforeLoop2 := exc
+          _blur_x_s0_y := _t35
+          while (_blur_x_s0_y < _t35 + 3)
+            invariant exc == excBeforeLoop2
+            invariant _t35 <= _blur_x_s0_y
+            invariant _blur_x_s0_y < _t35 + 3 + 1
+            invariant (forall _0__1: Int ::
+                { aloc(opt_get1(_inp), _0__1).int }
+                0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+                acc(aloc(opt_get1(_inp), _0__1).int, wildcard))
+            invariant (forall _blur_x_s0_x_v1_forall__blur_x_s0_x_x_forall__blur_x_s0_y_forall: Int ::
+                { aloc(opt_get1(_blur_x), _blur_x_s0_x_v1_forall__blur_x_s0_x_x_forall__blur_x_s0_y_forall).int }
+                0 <=
+                _blur_x_s0_x_v1_forall__blur_x_s0_x_x_forall__blur_x_s0_y_forall -
+                (-1 * (1024 * (_blur_y_s0_y_y * 8)) +
+                1024 * (_blur_y_s0_y_y * 8 + _blur_y_s0_y_yi)) &&
+                _blur_x_s0_x_v1_forall__blur_x_s0_x_x_forall__blur_x_s0_y_forall -
+                (-1 * (1024 * (_blur_y_s0_y_y * 8)) +
+                1024 * (_blur_y_s0_y_y * 8 + _blur_y_s0_y_yi)) <
+                1024 * 3 ==>
+                acc(aloc(opt_get1(_blur_x), _blur_x_s0_x_v1_forall__blur_x_s0_x_x_forall__blur_x_s0_y_forall).int, 1 *
+                write)) 
+          {
+            flatten24 := (_blur_x_s0_y - _t34) * 128
+            _t37 := flatten24
+            flatten25 := _blur_x_s0_y * 1026
+            _t36 := flatten25
+            label loop2
+            excBeforeLoop3 := exc
+            flatten26 := 0
+            _blur_x_s0_x_x := flatten26
+            while (_blur_x_s0_x_x < 128)
+              invariant exc == excBeforeLoop3
+              invariant 0 <= _blur_x_s0_x_x
+              invariant _blur_x_s0_x_x < 128 + 1
+              invariant (forall _0__1: Int ::
+                  { aloc(opt_get1(_inp), _0__1).int }
+                  0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+                  acc(aloc(opt_get1(_inp), _0__1).int, wildcard))
+              invariant (forall xv1f_xxf: Int ::
+                  { aloc(opt_get1(_blur_x), xv1f_xxf).int }
+                  0 <=
+                  xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 &&
+                  xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 <
+                  8 * 128 ==>
+                  acc(aloc(opt_get1(_blur_x), xv1f_xxf).int, 1 * write))
+              invariant (forall xxf: Int ::
+                  { aloc(opt_get1(_blur_x), xxf).int }
+                  0 <= xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 &&
+                  xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 <
+                  8 * _blur_x_s0_x_x &&
+                  (xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) % 8 ==
+                  0 &&
+                  1 <= 8 ==>
+                  aloc(opt_get1(_blur_x), xxf).int ==
+                  (aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  (xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) / 8 *
+                  8 +
+                  1).int +
+                  (aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  (xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) / 8 *
+                  8 +
+                  2).int +
+                  aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  (xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) / 8 *
+                  8).int)) /
+                  3)
+              invariant (forall xxf: Int ::
+                  { aloc(opt_get1(_blur_x), xxf).int }
+                  0 <=
+                  xxf - ((_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 + 7) &&
+                  xxf - ((_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 + 7) <
+                  8 * _blur_x_s0_x_x &&
+                  (xxf - ((_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 + 7)) %
+                  8 ==
+                  0 &&
+                  0 <= 7 &&
+                  7 <= 8 - 1 ==>
+                  aloc(opt_get1(_blur_x), xxf).int ==
+                  (aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  ((xxf - ((_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 + 7)) /
+                  8 *
+                  8 +
+                  7) +
+                  1).int +
+                  (aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  ((xxf - ((_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 + 7)) /
+                  8 *
+                  8 +
+                  7) +
+                  2).int +
+                  aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  ((xxf - ((_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 + 7)) /
+                  8 *
+                  8 +
+                  7)).int)) /
+                  3)
+              invariant (forall xv1f_xxf: Int ::
+                  { aloc(opt_get1(_blur_x), xv1f_xxf).int }
+                  0 <=
+                  xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 &&
+                  xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024 <
+                  8 * _blur_x_s0_x_x ==>
+                  aloc(opt_get1(_blur_x), xv1f_xxf).int ==
+                  (aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  ((xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) /
+                  8 *
+                  8 +
+                  (xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) %
+                  8) +
+                  1).int +
+                  (aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  ((xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) /
+                  8 *
+                  8 +
+                  (xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) %
+                  8) +
+                  2).int +
+                  aloc(opt_get1(_inp), _blur_x_s0_y * 1026 +
+                  ((xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) /
+                  8 *
+                  8 +
+                  (xv1f_xxf - (_blur_x_s0_y - _blur_y_s0_y_y * 8) * 1024) %
+                  8)).int)) /
+                  3) 
+            {
+              flatten28 := _blur_x_s0_x_x * 8 + _t36
+              _t25 := flatten28
+              flatten29 := (_blur_x_s0_x_x + _t37) * 8
+              flatten30 := (aloc(opt_get1(_inp), _t25 + 1).int +
+                (aloc(opt_get1(_inp), _t25 + 2).int +
+                aloc(opt_get1(_inp), _t25).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten29).int := flatten30
+              flatten31 := (_blur_x_s0_x_x + _t37) * 8 + 1
+              flatten32 := (aloc(opt_get1(_inp), _t25 + 2).int +
+                (aloc(opt_get1(_inp), _t25 + 3).int +
+                aloc(opt_get1(_inp), _t25 + 1).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten31).int := flatten32
+              flatten33 := (_blur_x_s0_x_x + _t37) * 8 + 2
+              flatten34 := (aloc(opt_get1(_inp), _t25 + 3).int +
+                (aloc(opt_get1(_inp), _t25 + 4).int +
+                aloc(opt_get1(_inp), _t25 + 2).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten33).int := flatten34
+              flatten35 := (_blur_x_s0_x_x + _t37) * 8 + 3
+              flatten36 := (aloc(opt_get1(_inp), _t25 + 4).int +
+                (aloc(opt_get1(_inp), _t25 + 5).int +
+                aloc(opt_get1(_inp), _t25 + 3).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten35).int := flatten36
+              flatten37 := (_blur_x_s0_x_x + _t37) * 8 + 4
+              flatten38 := (aloc(opt_get1(_inp), _t25 + 5).int +
+                (aloc(opt_get1(_inp), _t25 + 6).int +
+                aloc(opt_get1(_inp), _t25 + 4).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten37).int := flatten38
+              flatten39 := (_blur_x_s0_x_x + _t37) * 8 + 5
+              flatten40 := (aloc(opt_get1(_inp), _t25 + 6).int +
+                (aloc(opt_get1(_inp), _t25 + 7).int +
+                aloc(opt_get1(_inp), _t25 + 5).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten39).int := flatten40
+              flatten41 := (_blur_x_s0_x_x + _t37) * 8 + 6
+              flatten42 := (aloc(opt_get1(_inp), _t25 + 7).int +
+                (aloc(opt_get1(_inp), _t25 + 8).int +
+                aloc(opt_get1(_inp), _t25 + 6).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten41).int := flatten42
+              flatten43 := (_blur_x_s0_x_x + _t37) * 8 + 7
+              flatten44 := (aloc(opt_get1(_inp), _t25 + 8).int +
+                (aloc(opt_get1(_inp), _t25 + 9).int +
+                aloc(opt_get1(_inp), _t25 + 7).int)) /
+                3
+              aloc(opt_get1(_blur_x), flatten43).int := flatten44
+              flatten27 := _blur_x_s0_x_x
+              _blur_x_s0_x_x := _blur_x_s0_x_x + 1
+            }
+            flatten23 := _blur_x_s0_y
+            _blur_x_s0_y := _blur_x_s0_y + 1
+          }
+          flatten45 := (_blur_y_s0_y_yi + _t34) * 128
+          _t39 := flatten45
+          flatten46 := _blur_y_s0_y_yi * 128
+          _t38 := flatten46
+          label loop3
+          excBeforeLoop4 := exc
+          flatten47 := 0
+          _blur_y_s0_x_x := flatten47
+          while (_blur_y_s0_x_x < 128)
+            invariant exc == excBeforeLoop4
+            invariant 0 <= _blur_y_s0_x_x
+            invariant _blur_y_s0_x_x < 128 + 1
+            invariant (forall _0__1: Int ::
+                { aloc(opt_get1(_inp), _0__1).int }
+                0 <= _0__1 && _0__1 < 1026 * 1026 ==>
+                acc(aloc(opt_get1(_inp), _0__1).int, wildcard))
+            invariant (forall _x__y: Int ::
+                { aloc(opt_get1(_blur_x), _x__y).int }
+                0 <=
+                _x__y -
+                (-1 - 1024 * (_blur_y_s0_y_y * 8) + 1 +
+                1024 * (_blur_y_s0_y_y * 8)) &&
+                _x__y -
+                (-1 - 1024 * (_blur_y_s0_y_y * 8) + 1 +
+                1024 * (_blur_y_s0_y_y * 8)) <
+                1024 * 10 ==>
+                acc(aloc(opt_get1(_blur_x), _x__y).int, 1 * write / 2))
+            invariant (forall _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall: Int ::
+                { aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall).int }
+                0 <=
+                _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall -
+                (_blur_y_s0_y_y * 8 + _blur_y_s0_y_yi) * 1024 &&
+                _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall -
+                (_blur_y_s0_y_y * 8 + _blur_y_s0_y_yi) * 1024 <
+                8 * 128 ==>
+                acc(aloc(opt_get1(_blur_y), _blur_y_s0_x_v0_forall__blur_y_s0_x_x_forall).int, 1 *
+                write)) 
+          {
+            flatten49 := _blur_y_s0_x_x + _t38
+            _t26 := flatten49
+            flatten50 := (_blur_y_s0_x_x + _t39) * 8
+            flatten51 := (aloc(opt_get1(_blur_x), _t26 * 8 + 1024).int +
+              (aloc(opt_get1(_blur_x), _t26 * 8 + 2048).int +
+              aloc(opt_get1(_blur_x), _t26 * 8).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten50).int := flatten51
+            flatten52 := _blur_y_s0_x_x + _t38
+            _t27 := flatten52
+            flatten53 := (_blur_y_s0_x_x + _t39) * 8 + 1
+            flatten54 := (aloc(opt_get1(_blur_x), _t27 * 8 + 1025).int +
+              (aloc(opt_get1(_blur_x), _t27 * 8 + 2049).int +
+              aloc(opt_get1(_blur_x), _t27 * 8 + 1).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten53).int := flatten54
+            flatten55 := _blur_y_s0_x_x + _t38
+            _t28 := flatten55
+            flatten56 := (_blur_y_s0_x_x + _t39) * 8 + 2
+            flatten57 := (aloc(opt_get1(_blur_x), _t28 * 8 + 1026).int +
+              (aloc(opt_get1(_blur_x), _t28 * 8 + 2050).int +
+              aloc(opt_get1(_blur_x), _t28 * 8 + 2).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten56).int := flatten57
+            flatten58 := _blur_y_s0_x_x + _t38
+            _t29 := flatten58
+            flatten59 := (_blur_y_s0_x_x + _t39) * 8 + 3
+            flatten60 := (aloc(opt_get1(_blur_x), _t29 * 8 + 1027).int +
+              (aloc(opt_get1(_blur_x), _t29 * 8 + 2051).int +
+              aloc(opt_get1(_blur_x), _t29 * 8 + 3).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten59).int := flatten60
+            flatten61 := _blur_y_s0_x_x + _t38
+            _t30 := flatten61
+            flatten62 := (_blur_y_s0_x_x + _t39) * 8 + 4
+            flatten63 := (aloc(opt_get1(_blur_x), _t30 * 8 + 1028).int +
+              (aloc(opt_get1(_blur_x), _t30 * 8 + 2052).int +
+              aloc(opt_get1(_blur_x), _t30 * 8 + 4).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten62).int := flatten63
+            flatten64 := _blur_y_s0_x_x + _t38
+            _t31 := flatten64
+            flatten65 := (_blur_y_s0_x_x + _t39) * 8 + 5
+            flatten66 := (aloc(opt_get1(_blur_x), _t31 * 8 + 1029).int +
+              (aloc(opt_get1(_blur_x), _t31 * 8 + 2053).int +
+              aloc(opt_get1(_blur_x), _t31 * 8 + 5).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten65).int := flatten66
+            flatten67 := _blur_y_s0_x_x + _t38
+            _t32 := flatten67
+            flatten68 := (_blur_y_s0_x_x + _t39) * 8 + 6
+            flatten69 := (aloc(opt_get1(_blur_x), _t32 * 8 + 1030).int +
+              (aloc(opt_get1(_blur_x), _t32 * 8 + 2054).int +
+              aloc(opt_get1(_blur_x), _t32 * 8 + 6).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten68).int := flatten69
+            flatten70 := _blur_y_s0_x_x + _t38
+            _t33 := flatten70
+            flatten71 := (_blur_y_s0_x_x + _t39) * 8 + 7
+            flatten72 := (aloc(opt_get1(_blur_x), _t33 * 8 + 1031).int +
+              (aloc(opt_get1(_blur_x), _t33 * 8 + 2055).int +
+              aloc(opt_get1(_blur_x), _t33 * 8 + 7).int)) /
+              3
+            aloc(opt_get1(_blur_y), flatten71).int := flatten72
+            flatten48 := _blur_y_s0_x_x
+            _blur_y_s0_x_x := _blur_y_s0_x_x + 1
+          }
+          flatten21 := _blur_y_s0_y_yi
+          _blur_y_s0_y_yi := _blur_y_s0_y_yi + 1
+        }
+        flatten17 := false
+        once := flatten17
+      }
+    }
+    inhale false
+  }
+  flatten73 := 0
+  return := flatten73
+  goto end
+  label end
+  res := return
+  label bubble
+  assert exc == null
+}
+
+method check_sat_type()
+{
+  assert false
+}
+
+method check_sat_subtype(subtype1: Int, subtype2: Int)
+  requires subtype2 >= 0
+  requires subtype2 <= 2
+  requires subtype1 >= 0
+  requires subtype1 <= 2
+{
+  assert false
+}

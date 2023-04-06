@@ -1,0 +1,24 @@
+\begin{tabular}{l l \vbar \vbar r r \vbar r \vbar r \vbar r r r r \vbar \vbar r}
+\hline Name & & \multicolumn{2}{l\vbar}{\halide} & \multicolumn{1}{l\vbar}{Fr-end} & Sched. & \multicolumn{3}{l}{\pvl} & & LoA \\
+& & LoC & LoA & T. (s) & LoC & LoC & LoA & Loops & T. (s) & incr. \\ \hline \hline
+blur & V0 & 5 & 2 & 12 & 0 & 23 &25 &2 & 24 & 12.5x\\ \hline
+ & V1-\{f,p\} & \ditto & \ditto & \ditto &2 &20 &21 &1 & 22 & 10.5x\\ \hline
+ & V2-\{c,p,r,s\} & \ditto & \ditto & \ditto &5 &37 &45 &6 &  F & 22.5x\\ \hline
+ & V3-\{c,p,s,st\} & \ditto & \ditto & \ditto &6 &43 &50 &7 & T.O. & 25.0x\\ \hline
+\hline
+hist & V0 & 29 & 6 & 12 & 0 & 75 &57 &11 & 35 & 9.5x\\ \hline
+ & V1-\{c,p,r,u\} & \ditto & \ditto & \ditto &4 &81 &58 &11 & T.O. & 9.7x\\ \hline
+ & V2-\{c,p,r,u\} & \ditto & \ditto & \ditto &6 &76 &73 &13 & 70 & 12.2x\\ \hline
+ & V3-\{c,cl,p,r,s,u\} & \ditto & \ditto & \ditto &16 &87 &84 &17 & 110 & 14.0x\\ \hline
+\hline
+conv\_ & V0 & 9 & 7 & 14 & 0 & 67 &101 &7 & 44 & 14.4x\\ \hline
+layer & V1-\{c,f,p,u\} & \ditto & \ditto & \ditto &4 &70 &101 &8 & 52 & 14.4x\\ \hline
+ & V2-\{p,r,s,u\} & \ditto & \ditto & \ditto &6 &79 &120 &10 & 76 & 17.1x\\ \hline
+ & V3-\{c,p,r,s,u\} & \ditto & \ditto & \ditto &15 &71 &100 &7 & T.O. & 14.3x\\ \hline
+\hline
+gemm & V0 & 18 & 6 & 17 & 0 & 43 &61 &3 & 56 & 10.2x\\ \hline
+ & V1-\{c,p,r,s\} & \ditto & \ditto & \ditto &8 &64 &114 &10 & T.O. & 19.0x\\ \hline
+ & V2-\{c,p,r,s,u\} & \ditto & \ditto & \ditto &19 &121 &255 &26 & T.O. & 42.5x\\ \hline
+ & V3-\{c,f,p,r,s,u\} & \ditto & \ditto & \ditto &23 &156 &352 &31 & T.O. & 58.7x\\ \hline
+\hline
+\end{tabular}

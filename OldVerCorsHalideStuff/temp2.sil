@@ -1,0 +1,128 @@
+// Generated on 2021-06-07 at 17:22:53
+domain TYPE {
+  
+  unique function class_Ref(): TYPE
+  
+  unique function class_java_DOT_lang_DOT_Object(): TYPE
+  
+  unique function class_EncodedGlobalVariables(): TYPE
+  
+  function directSuperclass(t: TYPE): TYPE
+  
+  function type_of(val: Ref): TYPE
+  
+  axiom Ref_directSuperclass {
+    directSuperclass(class_Ref()) == class_java_DOT_lang_DOT_Object()
+  }
+  
+  axiom EncodedGlobalVariables_directSuperclass {
+    directSuperclass(class_EncodedGlobalVariables()) == class_java_DOT_lang_DOT_Object()
+  }
+}
+
+domain frac {
+  
+  function frac_val(a: frac): Perm
+  
+  axiom frac_eq {
+    (forall a: frac, b: frac :: { frac_val(a),frac_val(b) } (frac_val(a) == frac_val(b)) == (a == b))
+  }
+  
+  axiom frac_bound {
+    (forall a: frac :: { frac_val(a) } 0 / 1 < frac_val(a) && frac_val(a) <= 1 / 1)
+  }
+}
+
+domain zfrac {
+  
+  function zfrac_val(a: zfrac): Perm
+  
+  axiom zfrac_eq {
+    (forall a: zfrac, b: zfrac :: { zfrac_val(a),zfrac_val(b) } (zfrac_val(a) == zfrac_val(b)) == (a == b))
+  }
+  
+  axiom zfrac_bound {
+    (forall a: zfrac :: { zfrac_val(a) } 0 / 1 <= zfrac_val(a) && zfrac_val(a) <= 1 / 1)
+  }
+}
+
+domain VCTArray[CT] {
+  
+  function loc(a: VCTArray[CT], i: Int): CT
+  
+  function alen(a: VCTArray[CT]): Int
+  
+  function second(r: CT): Int
+  
+  axiom good_name_here {
+    (forall a: VCTArray[CT], i: Int :: { (loc(a, i): CT) } (second((loc(a, i): CT)): Int) == (second((loc(a, 0): CT)): Int) + i)
+  }
+  
+  axiom second_injectivity {
+    (forall a: VCTArray[CT], b: VCTArray[CT], i: Int, j: Int :: { (loc(a, i): CT),(loc(b, j): CT) } (second((loc(a, i): CT)): Int) == (second((loc(b, j): CT)): Int) ==> (loc(a, i): CT) == (loc(b, j): CT))
+  }
+  
+  axiom len_nonneg {
+    (forall a: VCTArray[CT] :: { (alen(a): Int) } (alen(a): Int) >= 0)
+  }
+}
+
+domain VCTOption[T] {
+  
+  function VCTNone(): VCTOption[T]
+  
+  function VCTSome(t: T): VCTOption[T]
+  
+  function getVCTOption(o: VCTOption[T]): T
+  
+  axiom not_equal_vct {
+    (forall x: T :: { (VCTSome(x): VCTOption[T]) } (VCTNone(): VCTOption[T]) != (VCTSome(x): VCTOption[T]))
+  }
+  
+  axiom get_axiom_vct {
+    (forall x: T :: { (getVCTOption((VCTSome(x): VCTOption[T])): T) } (getVCTOption((VCTSome(x): VCTOption[T])): T) == x)
+  }
+  
+  axiom get_axiom_vct_2 {
+    (forall x: VCTOption[T] :: { (VCTSome((getVCTOption(x): T)): VCTOption[T]) } (VCTSome((getVCTOption(x): T)): VCTOption[T]) == x)
+  }
+}
+
+//  a field 
+field Integer__item: Int
+
+function instanceof_TYPE_TYPE(t: TYPE, u: TYPE): Bool
+  ensures result == (t == u || directSuperclass(t) == u)
+
+
+function new_frac(x: Perm): frac
+  requires 0 / 1 < x && x <= 1 / 1
+  ensures frac_val(result) == x
+
+
+function new_zfrac(x: Perm): zfrac
+  requires 0 / 1 <= x && x <= 1 / 1
+  ensures zfrac_val(result) == x
+
+
+function getVCTOption1(x: VCTOption[VCTArray[Ref]]): VCTArray[Ref]
+  requires x != (VCTNone(): VCTOption[VCTArray[Ref]])
+{
+  (getVCTOption(x): VCTArray[Ref])
+}
+
+method Ref_parrallel_region_main_2_Integer_Option$Array$Cell$Integer$$$_Integer_Integer(diz: Ref, opencl_gsize: Int, _in: VCTOption[VCTArray[Ref]], opencl_gid: Int, opencl_gcount: Int)
+  requires diz != null
+  requires 0 < opencl_gsize ==> _in != (VCTNone(): VCTOption[VCTArray[Ref]])
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } opencl_gid * opencl_gsize * 2 + 1 <= opencl_lid && opencl_lid < (opencl_gid + 1) * opencl_gsize * 2 + 1 && (opencl_lid - 1) % 2 == 0 ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, 1 / 1))
+  requires (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } opencl_gid * opencl_gsize * 2 <= opencl_lid && opencl_lid < (opencl_gid + 1) * opencl_gsize * 2 && (opencl_lid) % 2 == 0 ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, 1 / 1))
+  requires 0 < opencl_gsize ==> opencl_gsize == 32
+  requires 0 < opencl_gsize ==> opencl_gcount == 2
+  requires 0 <= opencl_gid && opencl_gid < opencl_gcount
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } opencl_gid * opencl_gsize * 2 + 1 <= opencl_lid && opencl_lid < (opencl_gid + 1) * opencl_gsize * 2 + 1 && (opencl_lid - 1) % 2 == 0 ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, 1 / 1))
+  ensures (forall opencl_lid: Int :: { (loc(getVCTOption1(_in), opencl_lid): Ref) } opencl_gid * opencl_gsize * 2 <= opencl_lid && opencl_lid < (opencl_gid + 1) * opencl_gsize * 2 && (opencl_lid % 2 == 0 && opencl_gid * opencl_gsize + (opencl_lid / 2 - opencl_gid * opencl_gsize) <= 63) ==> acc((loc(getVCTOption1(_in), opencl_lid): Ref).Integer__item, 1 / 1))
+  ensures (forall opencl_lid: Int :: 0 <= opencl_lid && opencl_lid < opencl_gsize ==> (loc(getVCTOption1(_in), (opencl_gid * opencl_gsize + opencl_lid) * 2 + 1): Ref).Integer__item % 2 == 0)
+  ensures (forall opencl_lid: Int :: 0 <= opencl_lid && opencl_lid < opencl_gsize ==> (loc(getVCTOption1(_in), (opencl_gid * opencl_gsize + opencl_lid) * 2 + 0): Ref).Integer__item % 2 == 0)
+{
+  inhale false
+}

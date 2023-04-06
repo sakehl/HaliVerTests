@@ -1,0 +1,89 @@
+* add: #include <opencl.h>
+
+* The line numbers of errors make no sense, because of the preprocessing
+
+* add "--encoded temp.sil" to the cmd line, to see the file that is verified
+
+* null is not recognized as something (use \array or something) (use NULL)
+
+
+To verify function in:
+* GPU tile (blocks) exact dimensions:
+  * modulo_3 (warning)
+  * modulo_3_fallback (warning)
+  * Replace 32 with get_local_size(0) (warning)
+
+'--debug vct.main.Main' 
+
+clang -C -E -nostdinc -nocudainc -nocudalib --cuda-host-only -isystem /media/data/vercors/src/main/universal/res/include -I/media/data/vercors/../halide-dev/verification-tests - ../halide-dev/verification-tests/even_opencl_kernel_gen.c
+
+--debug vct.main.Main --silicon array_triggers/even_opencl_kernel_minimal.c
+--silicon array_triggers/even_opencl_kernel_minimal.c
+--silicon --encoded temp.sil array_triggers/even_opencl_kernel_minimal.c 
+
+--debug vct.main.Main --silicon ../halide-dev/verification-tests/even_opencl_kernel_gen.c
+--silicon ../halide-dev/verification-tests/even_opencl_kernel_gen.c
+
+--silicon ../halide-dev/verification-tests/temp.pvl
+
+--silicon Tests/shared_memory_gpu/opencl_globalmem_barrier.c --encoded temp.sil --debug vct.main.Main
+
+--silicon Tests/shared_memory_gpu/opencl_localmem_barrier.c --debug vct.main.Main
+
+--silicon Tests/shared_memory_gpu/opencl_dynamic_shared_memory.c
+
+
+decls = {ArraySeq$ofRef@7502} "ArraySeq$ofRef" size = 2
+ 0 = {DeclarationStatement@7516} "int opencl_gid;"
+ 1 = {DeclarationStatement@7517} "int opencl_lid;"
+triggers = {ArraySeq$ofRef@7503} "ArraySeq$ofRef" size = 0
+select = {OperatorExpression@7504} "0 <= opencl_gid && opencl_gid < opencl_gcount && (0 <= opencl_lid && opencl_lid < opencl_gsize)"
+main = {OperatorExpression@7505} "Perm( VCTArray<CT:Ref>.loc(VCTOption<T:VCTArray<CT:Ref>>.getVCTOption1(_in),opencl_lid).Integer__item , read )"
+
+rewriteArrayAccessesForQuantifiers
+
+
+Shared memory:
+1. Add parser support (DONE)
+2. Add a given parameter "given int shared_mem_size;"
+2.5 support kernel calls
+3. If we have a declared __local array:
+  for instance: "__local int* shared", replace it with 
+  "int shared[shared_mem_size]" at group_level
+7. The permissions per thread, should be specified from the programmer itself.
+  - Do not add any annotations concerning permissions for "shared" to the top-level, and the thread_block level. (filter them out)
+  - Do add them to thread level
+?8. DISCUSS: Do we add "shared != null" ourselves? It is instiatiated by the kernel call. Unsure. Also, consider length?
+
+
+LIMITATIONS:
+- Only one shared array possible
+- We do not distinguish between local and global barriers. We ALWAYS have a global barrier. Unsure on how to fix this. Maybe vercors should then support local/shared memory arrays itself?
+
+
+Tests:
+Pass
+- opencl single shared memory
+- opencl multiple dynamic memory
+- OpenCL mixed dynamix and static shared memory
+- pointer shared memory
+- array shared memory
+- opencl local memory barrier
+- opencl global memory barrier
+
+Fail
+- opencl static shared memory without size
+- opencl static shared memory with none static size
+- opencl static keyword
+- opencl extern keyword
+- opencl not top-level scope shared mem
+- opencl global memory keyword in body
+- opencl initialize shared memory
+- No global or local storage identifiers parameters opencl
+- Array array shared memory
+- cuda dynamic shared array with size
+- opencl local barrier, global memory
+- cuda barrier, trying sychronizing whole kernel
+- opencl global barrier, trying sychronizing whole kernel
+- cuda kernel parameters with shared
+- 

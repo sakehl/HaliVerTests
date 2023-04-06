@@ -1,0 +1,94 @@
+
+class Test{
+
+  given int opencl_gcount;
+  given int opencl_gsize;
+  given int shared_mem_size;
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );shared_mem_size == 33));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );_even != null));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );_in != null));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gsize == 33));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gcount == 4));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid < 32 ==> Perm( _in [ (opencl_gid * 32 + opencl_lid) ] , read )));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 0 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid) ] , read )));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 1 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid + - 1) ] , read )));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 2 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid + - 2) ] , read )));
+  requires (\forall* int opencl_gid;( opencl_gid \memberof ({ 0 .. opencl_gcount }) );(\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> Perm( _even [ (opencl_gid * 32 + opencl_lid) ] , 1 \ 1 )));
+void _kernel_even_s0_x_bx___block_id_x(int[] _even,int[] _in)
+  {
+  //invariants __vercors_kernel_invariant__ (true){
+    //parallel {
+      par kernel_block(int opencl_gid = 0 .. opencl_gcount)
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );_even != null);
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );_in != null);
+  
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );shared_mem_size == 33);
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gsize == 33);
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gcount == 4);
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid < 32 ==> Perm( _in [ (opencl_gid * 32 + opencl_lid) ] , read ));
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 0 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid) ] , read ));
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 1 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid + - 1) ] , read ));
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 2 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid + - 2) ] , read ));
+        requires (\forall* int opencl_lid;( opencl_lid \memberof ({ 0 .. opencl_gsize }) );opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> Perm( _even [ (opencl_gid * 32 + opencl_lid) ] , 1 \ 1 ));
+      {
+        int[shared_mem_size] _in_in_even__0_0_shared = new int[shared_mem_size];
+        par group_block(int opencl_lid = 0 .. opencl_gsize )
+            requires _even != null;
+            requires _in != null;
+            requires _in_in_even__0_0_shared != null;
+            requires opencl_gsize == 33;
+            requires shared_mem_size == 33;
+            requires opencl_gcount == 4;
+            context (opencl_gid * 32 + opencl_lid <= 127 && opencl_lid < 32 ==> Perm( _in [ (opencl_gid * 32 + opencl_lid) ] , read ));
+            context (opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 0 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid) ] , read ));
+            context (opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 1 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid + - 1) ] , read ));
+            context (opencl_gid * 32 + opencl_lid <= 127 && opencl_lid == 32 && opencl_gid == 2 ==> Perm( _in [ (opencl_gid * 33 + opencl_lid + - 2) ] , read ));
+            context (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 32 ==> Perm( _even [ (opencl_gid * 32 + opencl_lid) ] , 1 \ 1 ));
+
+
+            requires (opencl_gid * 32 + opencl_lid <= 127 && opencl_lid < 33 ==> Perm( _in_in_even__0_0_shared [ opencl_lid ] , write ));
+            ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid == 0 ==> Perm( _in_in_even__0_0_shared [opencl_lid] , 1 ));
+            ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid > 0 && opencl_lid < 32 ==> Perm( _in_in_even__0_0_shared [opencl_lid] , 1 \ 2 ));
+            ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid == 31 ==> Perm( _in_in_even__0_0_shared [opencl_lid + 1 ] , 1 ));
+            ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid < 31 ==> Perm( _in_in_even__0_0_shared [opencl_lid + 1 ] , 1 \ 2 ));
+          {
+            int _even_s0_x_bx___block_id_x = opencl_gid;
+            int ___thread_id_x = opencl_lid;
+            int _11 = _even_s0_x_bx___block_id_x * 32;
+            int _12 = _11 > 95 ? _11 : 95;
+            int _13 = _12 + ___thread_id_x;
+            boolean _14 = _13 < 128;
+            if (_14) {
+              int _15 = _even_s0_x_bx___block_id_x * 32;
+              int _16 = _15 + ___thread_id_x;
+              int _17 = _in [ _16 ];
+              _in_in_even__0_0_shared[___thread_id_x ] = _17;
+            }
+            barrier(group_block){
+                requires _in_in_even__0_0_shared != null;
+
+                requires (opencl_gid * 32 + opencl_lid <= 127 && opencl_lid < 33 ==> Perm( _in_in_even__0_0_shared [ opencl_lid ] , write ));
+                ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid == 0 ==> Perm( _in_in_even__0_0_shared[opencl_lid] , 1 ));
+                ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid > 0 && opencl_lid < 32 ==> Perm( _in_in_even__0_0_shared [opencl_lid] , 1 \ 2 ));
+                ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid == 31 ==> Perm( _in_in_even__0_0_shared[opencl_lid + 1 ] , 1 ));
+                ensures (opencl_gid * 32 + opencl_lid <= 126 && opencl_lid < 33 && opencl_lid < 31 ==> Perm( _in_in_even__0_0_shared[opencl_lid + 1 ] , 1 \ 2 ));
+            }
+            int _18 = 0;
+            int _19 = _even_s0_x_bx___block_id_x * 32;
+            int _20 = _19 + ___thread_id_x;
+            boolean _21 = _20 <= 126;
+            boolean _22 = ___thread_id_x < 32;
+            boolean _23 = _21 && _22;
+            if (_23) {
+              int _24 = _in_in_even__0_0_shared [ ___thread_id_x ];
+              int _25 = ___thread_id_x + 1;
+              int _26 = _in_in_even__0_0_shared [ _25 ];
+              int _27 = _24 + _26;
+              int _28 = _even_s0_x_bx___block_id_x * 32;
+              int _29 = _28 + ___thread_id_x;
+              _even [ _29 ] = _27;
+            }
+          }
+      }
+  }
+}

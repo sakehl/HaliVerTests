@@ -1,0 +1,621 @@
+domain WellFoundedOrder[T] {
+  
+  function bounded(v: T): Bool
+  
+  function decreasing(v1: T, v2: T): Bool
+}
+
+domain IntOrder {
+  
+  axiom {
+    (forall i: Int :: 0 <= i == (bounded(i): Bool))
+  }
+  
+  axiom {
+    (forall i: Int :: (forall j: Int :: i < j == (decreasing(i, j): Bool)))
+  }
+}
+
+domain any {
+  
+  
+}
+
+domain t_null {
+  
+  function v_null(): t_null
+  
+  axiom {
+    (forall v3: t_null :: true ==> v_null() == v3)
+  }
+}
+
+domain option[T1] {
+  
+  function None(): option[T1]
+  
+  function some(x: T1): option[T1]
+  
+  function option_get(opt: option[T1]): T1
+  
+  axiom {
+    (forall x1: T1 :: { (some(x1): option[T1]) } true ==> (None(): option[T1]) != (some(x1): option[T1]))
+  }
+  
+  axiom {
+    (forall x1: T1 :: { (option_get((some(x1): option[T1])): T1) } true ==> (option_get((some(x1): option[T1])): T1) == x1)
+  }
+  
+  axiom {
+    (forall opt1: option[T1] :: { (some((option_get(opt1): T1)): option[T1]) } true ==> (some((option_get(opt1): T1)): option[T1]) == opt1)
+  }
+}
+
+domain block {
+  
+  function block_length(b: block): Int
+  
+  function loc(b1: block, i: Int): Ref
+  
+  function loc_inv_1(r: Ref): block
+  
+  function loc_inv_2(r1: Ref): Int
+  
+  axiom {
+    (forall b2: block :: true ==> block_length(b2) >= 0)
+  }
+  
+  axiom {
+    (forall b2: block :: true ==> (forall i1: Int :: true ==> loc_inv_1(loc(b2, i1)) == b2 && loc_inv_2(loc(b2, i1)) == i1))
+  }
+}
+
+domain pointer {
+  
+  function pointer_of(b2: block, offset: Int): pointer
+  
+  function pointer_block(p: pointer): block
+  
+  function pointer_offset(p1: pointer): Int
+  
+  axiom {
+    (forall p2: pointer :: true ==> pointer_offset(p2) >= 0 && pointer_offset(p2) < block_length(pointer_block(p2)))
+  }
+  
+  axiom {
+    (forall b3: block :: true ==> (forall offset1: Int :: true ==> pointer_block(pointer_of(b3, offset1)) == b3 && pointer_offset(pointer_of(b3, offset1)) == offset1))
+  }
+}
+
+domain void {
+  
+  function unit(): void
+  
+  axiom {
+    (forall v3: void :: true ==> unit() == v3)
+  }
+}
+
+field int: Int
+
+function any_as(t: any): any
+
+
+function as_any(t: any): any
+  ensures any_as(result) == t
+
+
+function opt_get(opt1: option[any]): any
+  requires opt1 != (None(): option[any])
+  ensures (some(result): option[any]) == opt1
+{
+  (option_get(opt1): any)
+}
+
+function opt_or_else(opt1: option[any], alt: any): any
+  ensures opt1 == (None(): option[any]) ==> result == alt
+  ensures opt1 != (None(): option[any]) ==> result == opt_get(opt1)
+{
+  (opt1 == (None(): option[any]) ? alt : opt_get(opt1))
+}
+
+function ptr_deref(p2: pointer): Ref
+{
+  loc(pointer_block(p2), pointer_offset(p2))
+}
+
+function ptr_add(p2: pointer, offset1: Int): pointer
+  requires 0 <= pointer_offset(p2) + offset1
+  requires pointer_offset(p2) + offset1 < block_length(pointer_block(p2))
+{
+  pointer_of(pointer_block(p2), pointer_offset(p2) + offset1)
+}
+
+function opt_get1(opt1: option[pointer]): pointer
+  requires opt1 != (None(): option[pointer])
+  ensures (some(result): option[pointer]) == opt1
+{
+  (option_get(opt1): pointer)
+}
+
+function scale(amount: Perm): Perm
+  requires amount >= 0 * write
+{
+  amount
+}
+
+function type(type1: Ref): Int
+  ensures result >= 0
+  ensures result <= 1
+  ensures type1 == null ==> result == 0
+  ensures type1 != null ==> result != 0
+
+
+function subtype(subtype1: Int, subtype2: Int): Bool
+  requires subtype1 >= 0
+  requires subtype1 <= 1
+  requires subtype2 >= 0
+  requires subtype2 <= 1
+{
+  (subtype1 == 0 ==> true) && (subtype1 == 1 ==> subtype2 == 1)
+}
+
+predicate lock_inv_Object(this: Ref) {
+  true
+}
+
+predicate lock_held_Object(this: Ref) 
+
+method check_sat_unknown()
+{
+  assert false
+}
+
+method unknown(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown1()
+{
+  assert false
+}
+
+method unknown1(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown2()
+{
+  assert false
+}
+
+method unknown2(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown3()
+{
+  assert false
+}
+
+method unknown3(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown4()
+{
+  assert false
+}
+
+method unknown4(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown5()
+{
+  assert false
+}
+
+method unknown5(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown6()
+{
+  assert false
+}
+
+method unknown6(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown7()
+{
+  assert false
+}
+
+method unknown7(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown8()
+{
+  assert false
+}
+
+method unknown8(tid: Int, dimindx: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown9()
+{
+  assert false
+}
+
+method unknown9(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown10()
+{
+  assert false
+}
+
+method unknown10(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown11()
+{
+  assert false
+}
+
+method unknown11(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown12()
+{
+  assert false
+}
+
+method unknown12(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown13()
+{
+  assert false
+}
+
+method unknown13(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown14()
+{
+  assert false
+}
+
+method unknown14(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown15()
+{
+  assert false
+}
+
+method unknown15(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat_unknown16()
+{
+  assert false
+}
+
+method unknown16(tid: Int) returns (exc: Ref, res: Int)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> true
+
+
+method check_sat__kernel_c_s0_x_bx___block_id_x(gridDimZ: Int, _c: option[pointer], _a: option[pointer], _b: option[pointer], blockDimX: Int, gridDimY: Int, blockDimZ: Int, blockDimY: Int, gridDimX: Int)
+  requires 0 < blockDimX
+  requires 0 < blockDimY
+  requires 0 < blockDimZ
+  requires 0 < gridDimX
+  requires 0 < gridDimY
+  requires 0 < gridDimZ
+  requires blockDimX == 32
+  requires blockDimY == 1
+  requires blockDimZ == 1
+  requires gridDimX == 2
+  requires gridDimY == 1
+  requires gridDimZ == 1
+  requires _a != (None(): option[pointer])
+  requires _b != (None(): option[pointer])
+  requires _c != (None(): option[pointer])
+  requires block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127
+  requires block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127
+  requires block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127
+  requires (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))
+  requires (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  requires (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  requires (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))
+  requires (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  requires (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+{
+  assert false
+}
+
+method _kernel_c_s0_x_bx___block_id_x(tid: Int, blockDimX: Int, blockDimY: Int, blockDimZ: Int, gridDimX: Int, gridDimY: Int, gridDimZ: Int, _a: option[pointer], _b: option[pointer], _c: option[pointer], __shared: option[pointer]) returns (exc: Ref, res: void)
+  requires 0 < blockDimX
+  requires 0 < blockDimY
+  requires 0 < blockDimZ
+  requires 0 < gridDimX
+  requires 0 < gridDimY
+  requires 0 < gridDimZ
+  requires blockDimX == 32
+  requires blockDimY == 1
+  requires blockDimZ == 1
+  requires gridDimX == 2
+  requires gridDimY == 1
+  requires gridDimZ == 1
+  requires _a != (None(): option[pointer])
+  requires _b != (None(): option[pointer])
+  requires _c != (None(): option[pointer])
+  requires block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127
+  requires block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127
+  requires block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127
+  requires (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))
+  requires (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  requires (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  requires (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))
+  requires (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  requires (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> 0 < blockDimX
+  ensures exc == null ==> 0 < blockDimY
+  ensures exc == null ==> 0 < blockDimZ
+  ensures exc == null ==> 0 < gridDimX
+  ensures exc == null ==> 0 < gridDimY
+  ensures exc == null ==> 0 < gridDimZ
+  ensures exc == null ==> blockDimX == 32
+  ensures exc == null ==> blockDimY == 1
+  ensures exc == null ==> blockDimZ == 1
+  ensures exc == null ==> gridDimX == 2
+  ensures exc == null ==> gridDimY == 1
+  ensures exc == null ==> gridDimZ == 1
+  ensures exc == null ==> _a != (None(): option[pointer])
+  ensures exc == null ==> _b != (None(): option[pointer])
+  ensures exc == null ==> _c != (None(): option[pointer])
+  ensures exc == null ==> block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127
+  ensures exc == null ==> block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127
+  ensures exc == null ==> block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127
+  ensures exc == null ==> (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))
+  ensures exc == null ==> (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  ensures exc == null ==> (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  ensures exc == null ==> (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && (0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)))) && i_threadIdxX_blockIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int)
+  ensures exc == null ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))
+  ensures exc == null ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  ensures exc == null ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(gridDimZ * write) * scale(gridDimY * write) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+  ensures exc == null ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX)) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int)
+{
+  var return: void
+  var blockIdxX: Int
+  var blockIdxY: Int
+  var blockIdxZ: Int
+  var threadIdxX: Int
+  var threadIdxY: Int
+  var threadIdxZ: Int
+  var unknown17: Int
+  var unknown18: Int
+  var unknown19: Bool
+  var unknown20: Int
+  var unknown21: Int
+  var unknown22: Int
+  var unknown23: Int
+  var unknown24: Int
+  var unknown25: Int
+  var unknown26: Int
+  var unknown27: Int
+  var unknown28: Int
+  var unknown29: Int
+  var unknown30: Int
+  var unknown31: Int
+  var unknown32: Int
+  var unknown33: Int
+  var unknown34: Bool
+  var unknown35: Int
+  var unknown36: Int
+  var unknown37: Int
+  var unknown38: Int
+  var unknown39: Int
+  var indet: Int
+  var indet1: Int
+  var indet2: Int
+  var indet3: Int
+  var once: Bool
+  var indet4: Int
+  var indet5: Int
+  var indet6: Int
+  var indet7: Int
+  var once1: Bool
+  var excBeforeLoop: Ref
+  var excBeforeLoop1: Ref
+  var evaluationDummy: Int
+  var evaluationDummy1: Int
+  var evaluationDummy2: Int
+  var evaluationDummy3: Int
+  exc := null
+  if (0 < gridDimZ && 0 < gridDimY && 0 < gridDimX) {
+    inhale indet >= 0
+    inhale indet < 2
+    if (indet == 0) {
+      exhale 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write))) && (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard)) && (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard)) && (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write))) && (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard)) && (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))
+      inhale 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write))) && (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard)) && (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)) && i_threadIdxX_blockIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard)) && (forall i_threadIdxX_blockIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int } (gridDimX < 1 ? 0 < gridDimX : true) && (0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX_blockIdxX && i_threadIdxX_blockIdxX < 64 * (gridDimX < 1 ? gridDimX : 1)))) && i_threadIdxX_blockIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX_blockIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX_blockIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX_blockIdxX)).int) && (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write))) && (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard)) && (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(1 * write / gridDimZ) * scale(1 * write / gridDimY) * scale(blockDimZ * write) * scale(blockDimY * write) * wildcard)) && (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX - 64 && i_threadIdxX - 64 < 2 * blockDimX)) && 1 <= gridDimX + 1 && i_threadIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int)
+    } elseif (indet == 1) {
+      inhale indet1 >= 0
+      inhale indet1 < gridDimX
+      blockIdxX := indet1
+      inhale indet2 >= 0
+      inhale indet2 < gridDimY
+      blockIdxY := indet2
+      inhale indet3 >= 0
+      inhale indet3 < gridDimZ
+      blockIdxZ := indet3
+      excBeforeLoop := exc
+      once := true
+      while (once)
+        invariant exc == excBeforeLoop
+        invariant once ==> 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && (blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))))
+        invariant !once ==> 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && (blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX)) && i_threadIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int)) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * (1 * write)))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(blockDimZ * write) * scale(blockDimY * write) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX)) && i_threadIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int))) 
+      {
+        if (0 < blockDimZ && 0 < blockDimX && 0 < blockDimY) {
+          inhale indet4 >= 0
+          inhale indet4 < 2
+          if (indet4 == 0) {
+            exhale 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * (1 * write)))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * (1 * write)))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard)))
+            inhale 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * (1 * write)))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard))) && (blockIdxX < 1 ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX)) && i_threadIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int)) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * (1 * write)))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int } 0 < blockDimX && 0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX) && i_threadIdxX <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int, scale(1 * write / blockDimZ) * scale(1 * write / blockDimY) * wildcard))) && (1 == blockIdxX ==> (forall i_threadIdxX: Int :: { ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int } 0 < blockDimX && (0 < 2 && (0 <= i_threadIdxX - blockIdxX * 64 && i_threadIdxX - blockIdxX * 64 < 2 * blockDimX)) && i_threadIdxX <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i_threadIdxX)).int == ptr_deref(ptr_add(opt_get1(_a), i_threadIdxX)).int + ptr_deref(ptr_add(opt_get1(_b), i_threadIdxX)).int))
+          } elseif (indet4 == 1) {
+            inhale indet5 >= 0
+            inhale indet5 < blockDimX
+            threadIdxX := indet5
+            inhale indet6 >= 0
+            inhale indet6 < blockDimY
+            threadIdxY := indet6
+            inhale indet7 >= 0
+            inhale indet7 < blockDimZ
+            threadIdxZ := indet7
+            excBeforeLoop1 := exc
+            once1 := true
+            while (once1)
+              invariant exc == excBeforeLoop1
+              invariant once1 ==> 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && (blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (blockIdxX < 1 ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_c), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i1)).int, 1 * write))) && (blockIdxX < 1 ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_a), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i1)).int, wildcard))) && (blockIdxX < 1 ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_b), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i1)).int, wildcard))) && (1 == blockIdxX ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_c), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i1)).int, 1 * write))) && (1 == blockIdxX ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_a), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i1)).int, wildcard))) && (1 == blockIdxX ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_b), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i1)).int, wildcard))))
+              invariant !once1 ==> 0 < blockDimX && 0 < blockDimY && 0 < blockDimZ && 0 < gridDimX && 0 < gridDimY && 0 < gridDimZ && (blockDimX == 32 && blockDimY == 1 && blockDimZ == 1 && gridDimX == 2 && gridDimY == 1 && gridDimZ == 1 && _a != (None(): option[pointer]) && _b != (None(): option[pointer]) && _c != (None(): option[pointer]) && block_length(pointer_block(opt_get1(_a))) - pointer_offset(opt_get1(_a)) == 127 && block_length(pointer_block(opt_get1(_b))) - pointer_offset(opt_get1(_b)) == 127 && block_length(pointer_block(opt_get1(_c))) - pointer_offset(opt_get1(_c)) == 127 && (blockIdxX < 1 ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_c), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i1)).int, 1 * write))) && (blockIdxX < 1 ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_a), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i1)).int, wildcard))) && (blockIdxX < 1 ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_b), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i1)).int, wildcard))) && (blockIdxX < 1 ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_c), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i1)).int == ptr_deref(ptr_add(opt_get1(_a), i1)).int + ptr_deref(ptr_add(opt_get1(_b), i1)).int)) && (1 == blockIdxX ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_c), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_c), i1)).int, 1 * write))) && (1 == blockIdxX ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_a), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_a), i1)).int, wildcard))) && (1 == blockIdxX ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_b), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> acc(ptr_deref(ptr_add(opt_get1(_b), i1)).int, wildcard))) && (1 == blockIdxX ==> (forall i1: Int :: { ptr_deref(ptr_add(opt_get1(_c), i1)).int } 0 < 2 && (0 <= i1 - (blockIdxX * 64 + threadIdxX * 2) && i1 - (blockIdxX * 64 + threadIdxX * 2) < 2) && i1 <= 126 ==> ptr_deref(ptr_add(opt_get1(_c), i1)).int == ptr_deref(ptr_add(opt_get1(_a), i1)).int + ptr_deref(ptr_add(opt_get1(_b), i1)).int))) 
+            {
+              unknown17 := blockIdxX
+              unknown18 := threadIdxX
+              unknown19 := unknown17 < 1
+              if (unknown19) {
+                unknown20 := unknown18 * 2
+                unknown21 := ptr_deref(ptr_add(opt_get1(_a), unknown20)).int
+                unknown22 := ptr_deref(ptr_add(opt_get1(_b), unknown20)).int
+                unknown23 := unknown21 + unknown22
+                ptr_deref(ptr_add(opt_get1(_c), unknown20)).int := unknown23
+                evaluationDummy := unknown23
+                unknown24 := unknown18 * 2
+                unknown25 := unknown24 + 1
+                unknown26 := ptr_deref(ptr_add(opt_get1(_a), unknown25)).int
+                unknown27 := ptr_deref(ptr_add(opt_get1(_b), unknown25)).int
+                unknown28 := unknown26 + unknown27
+                ptr_deref(ptr_add(opt_get1(_c), unknown25)).int := unknown28
+                evaluationDummy1 := unknown28
+              } else {
+                unknown29 := unknown18 * 2
+                unknown30 := unknown29 + 64
+                unknown31 := ptr_deref(ptr_add(opt_get1(_a), unknown30)).int
+                unknown32 := ptr_deref(ptr_add(opt_get1(_b), unknown30)).int
+                unknown33 := unknown31 + unknown32
+                ptr_deref(ptr_add(opt_get1(_c), unknown30)).int := unknown33
+                evaluationDummy2 := unknown33
+                unknown34 := unknown18 <= 30
+                if (unknown34) {
+                  unknown35 := unknown18 * 2
+                  unknown36 := unknown35 + 65
+                  unknown37 := ptr_deref(ptr_add(opt_get1(_a), unknown36)).int
+                  unknown38 := ptr_deref(ptr_add(opt_get1(_b), unknown36)).int
+                  unknown39 := unknown37 + unknown38
+                  ptr_deref(ptr_add(opt_get1(_c), unknown36)).int := unknown39
+                  evaluationDummy3 := unknown39
+                }
+              }
+              once1 := false
+            }
+            inhale false
+          }
+        }
+        once := false
+      }
+      inhale false
+    }
+  }
+  label end
+  res := return
+  label bubble
+}
+
+method check_sat_Object()
+{
+  assert false
+}
+
+method Object(tid: Int) returns (exc: Ref, res: Ref)
+  ensures exc != null ==> false
+  ensures exc == null ==> true
+  ensures exc == null ==> res != null
+  ensures exc == null ==> type(res) == 1
+  ensures exc == null ==> true
+{
+  var return: Ref
+  var this: Ref
+  exc := null
+  this := new()
+  inhale type(this) == 1
+  fold acc(lock_inv_Object(this), write)
+  exhale acc(lock_inv_Object(this), write) && this != null
+  return := this
+  goto end
+  label end
+  res := return
+  label bubble
+}
+
+method check_sat_type()
+{
+  assert false
+}
+
+method check_sat_subtype(subtype1: Int, subtype2: Int)
+  requires subtype2 >= 0
+  requires subtype2 <= 1
+  requires subtype1 >= 0
+  requires subtype1 <= 1
+{
+  assert false
+}

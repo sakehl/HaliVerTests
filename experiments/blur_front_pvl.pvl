@@ -1,0 +1,19 @@
+ ensures \result >= 0;
+ ensures \result < 256;
+pure int _input(int _0, int _1);
+ ensures \result >= 0;
+ ensures \result < 256;
+pure int _blur_x0(int _x, int _y) = ((_input_im(_x, _y) + _input_im(_x + 1, _y)) + _input_im(_x + 2, _y))/3;
+
+pure int _blur_x(int _x, int _y) = _blur_x0(_x, _y);
+ 
+ ensures \result >= 0;
+ ensures \result < 256;
+pure int _blur_y0(int _x, int _y) = ((_blur_x(_x, _y) + _blur_x(_x, _y + 1)) + _blur_x(_x, _y + 2))/3;
+
+pure int _blur_y(int _x, int _y) = _blur_y0(_x, _y);
+ 
+pure int _input_im0(int _0, int _1) = _input(_0, _1);
+
+pure int _input_im(int _0, int _1) = _input_im0(_0, _1);
+ 
