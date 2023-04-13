@@ -6,7 +6,7 @@ include(CTest)
 set(CMAKE_CXX_STANDARD 11)  # or newer
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
-set(CMAKE_PREFIX_PATH ../../Halide-install)
+set(CMAKE_PREFIX_PATH ../../halide-dev/Halide-install)
 
 find_package(Halide REQUIRED)
 
