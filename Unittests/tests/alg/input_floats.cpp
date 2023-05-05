@@ -5,17 +5,16 @@
 using namespace Halide;
 
 int main(int argc, char *argv[]) {
+  // TODO: It seems that this file can produce code for the back-end, that can sometimes `hang`
+  // We should investigate this
   Func f("f"), out("out");
   Var x("x"), y("y");
-  ImageParam input(type_of<int>(), 2, "input");
-  input.requires(input(_0, _1) >= 0);
+  ImageParam input(type_of<float>(), 2, "input");
+  input.requires(input(_0, _1) >= 0.0f);
 
-  out(x, y) = input(y, x) + 1;
-  out.ensures(out(x,y) == input(y, x) + 1);
-  out.ensures(out(x,y) > 0);
-
-  out.reorder(y, x);
-  out.parallel(x);
+  out(x, y) = input(y, x) + cast<float>(x) + cast<float>(y);
+  out.ensures(out(x,y) == input(y, x) + cast<float>(x) + cast<float>(y));
+  out.ensures(out(x,y) >= cast<float>(x) + cast<float>(y));
 
   int nx = 100, ny = 42;
   input.dim(0).set_bounds(0, ny);
@@ -35,5 +34,6 @@ int main(int argc, char *argv[]) {
   std::vector<Annotation> pipeline_anns;
 
   std::string name = argv[1];
+  out.translate_to_pvl(name +"_front.pvl", {input}, pipeline_anns); 
   out.compile_to_pvl(name + "_back.pvl" , {input}, pipeline_anns, name, new_target);
 }

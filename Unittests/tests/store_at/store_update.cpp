@@ -14,7 +14,6 @@ int main(int argc, char *argv[]) {
   f.ensures(implies(y != x, f(x,y) == x+y));
 
   out(x, y) = f(x,y) + 1;
-  out.ensures(out(x,y) == x+y + 1);
   out.ensures(implies(y == x, out(x,y) == 2*(x+y)+1));
   out.ensures(implies(y != x, out(x,y) == x+y+1));
 

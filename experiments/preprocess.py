@@ -4,6 +4,7 @@ import subprocess
 import os
 import time
 import json
+import atexit
 
 class LineInfo:
     def __init__(self, lines_of_code: int, nr_annotations: int, loops: int):
@@ -115,7 +116,7 @@ def as_line_info(dct: Dict[str, Any]) -> Union[Dict[str,Any], LineInfo]:
         return dct
 
 def read_results(prefix: str, name: str) -> Tuple[VerificationResults, Dict[str,float], Dict[str, LineInfo]]:
-    pre = f'results/{prefix}_{name}'
+    pre = f'{prefix}_{name}'
     with open(pre + "_results_verification.json") as f:
         results_verification = json.loads(f.read(), object_hook=as_ver_result)
         
@@ -135,15 +136,12 @@ def runCommand(command: str, verbose: bool = False, timeout: Optional[int] = Non
         print(f"Process was stopped after {to.timeout} seconds")
         if(to.stdout):
             print(to.stdout.decode('UTF-8'))
-        if(to.stderr):
-            print(to.stderr.decode('UTF-8'))
         end = time.time()
         return end - start, Result.TimeOut
         
     end = time.time()
     if(p.returncode != 0):
         print(p.stdout.decode('UTF-8'))
-        print(p.stderr.decode('UTF-8'))
         print(f"Return code was {p.returncode}")
         return end - start, Result.Fail
     elif verbose:
@@ -203,7 +201,7 @@ class Experiments:
             pvl_name = name + '_front_pvl.pvl'
             self.verification_times[name]['front'] = []
             for i in range(0,n):
-                verificationTime = runCommand('vct build/' + pvl_name, timeout=t)
+                verificationTime = runCommand('vct --backend-option --conditionalizePermissions --silicon-quiet build/' + pvl_name, timeout=t)
                 self.verification_times[name]['front'].append(verificationTime)
                 print(verificationTime)
         except Exception as e:
@@ -218,14 +216,14 @@ class Experiments:
                 pvl_name = name + '_pvl-' + v + '.pvl'
                 self.verification_times[name][v] = []
                 for i in range(0,n):
-                    verificationTime = runCommand('vct build/' + pvl_name, timeout=t)
+                    verificationTime = runCommand('vct --backend-option --conditionalizePermissions --silicon-quiet build/' + pvl_name, timeout=t)
                     self.verification_times[name][v].append(verificationTime)
                     print(verificationTime)
         except Exception as e:
             print(e)
 
     def save_results(self, prefix: str, name: str) -> None:
-        pre = f'results/{prefix}_{name}'
+        pre = f'{prefix}_{name}'
         with open(pre + '_results_verification.json', 'w') as f:
             f.write(json.dumps(self.verification_times[name]))
         with open(pre + '_compilation.json', 'w') as f:

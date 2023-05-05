@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     h(x) = k(x,x);
     h.ensure(h(x) == 0);
     h(x) += g(x*8 + r -4) + 1 ;
-    h.loop_invariant(h(x) % 2 == r % 2);
+    h.invarianth(x) % 2 == r % 2);
     h.ensure(h(x) % 2 == 0);
 
     in(x) = f(x,x) + h(x+1);//2*x*x+1;

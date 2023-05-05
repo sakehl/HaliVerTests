@@ -28,9 +28,9 @@ int main(int argc, char *argv[]) {
 
     // g(x,y) = 0.0f;
     // g(x,y) = g(x,y) + f(x+r, y);
-    // g.loop_invariant(implies(r==0, g(x,y) == 0));
-    // g.loop_invariant(implies(r>0, g(x,y) > 0));
-    // g.loop_invariant(g(x,y) % 2 == 0);
+    // g.invariant(implies(r==0, g(x,y) == 0));
+    // g.invariant(implies(r>0, g(x,y) > 0));
+    // g.invariant(g(x,y) % 2 == 0);
     // g.ensures(g(x,y) % 2 == 0);
 
     // g(x,y) = f(x,y)+ f(x+1,y) + f(x+2,y);
@@ -40,20 +40,20 @@ int main(int argc, char *argv[]) {
     // g(x,y) = 0;
     // g(x,y) += f(x+r, y);
     // g(x,r) = g(x,r-1) + j(x+r);
-    // g.loop_invariant(implies(r == 0, g(x,r) == 0));
-    // g.loop_invariant(forall(i, x==0 && y==i && r>=i+1 && 0<=i && i<4, g(x,r) == sumj ));
+    // g.invariant(implies(r == 0, g(x,r) == 0));
+    // g.invariant(forall(i, x==0 && y==i && r>=i+1 && 0<=i && i<4, g(x,r) == sumj ));
 
     g(x,y) = 0;
     g(s.x,s.y) = g(s.x-1, s.y-1) + 1;
-    g.loop_invariant(implies(s.x==0 && s.y==0, g(s.x,s.y)==0));
-    g.loop_invariant(implies(x==-1 && y==-1, g(s.x,s.y)==0));
-    g.loop_invariant(implies(s.x>0 && s.y==1 && x==0 && y==0, g(s.x,s.y)==1));
-    g.loop_invariant(implies(s.y>1 && x==0 && y==0, g(s.x,s.y)==1));
-    g.loop_invariant(implies(s.x>1 && s.y==2 && x==1 && y==1, g(s.x,s.y)==2));
+    g.invariant(implies(s.x==0 && s.y==0, g(s.x,s.y)==0));
+    g.invariant(implies(x==-1 && y==-1, g(s.x,s.y)==0));
+    g.invariant(implies(s.x>0 && s.y==1 && x==0 && y==0, g(s.x,s.y)==1));
+    g.invariant(implies(s.y>1 && x==0 && y==0, g(s.x,s.y)==1));
+    g.invariant(implies(s.x>1 && s.y==2 && x==1 && y==1, g(s.x,s.y)==2));
 
 
-    // g.loop_invariant(g(x,r) == sumj);
-    // g.loop_invariant(forall(i, x==i, g(x,r) > 0));
+    // g.invariant(g(x,r) == sumj);
+    // g.invariant(forall(i, x==i, g(x,r) > 0));
     // g.invariant()
 
     out(x,y) = g(x,y);
@@ -170,8 +170,8 @@ int main(int argc, char *argv[]) {
     sum(x) = 0;
     sum.ensures(sum(x) == 0);
     sum(rr) = sum(rr-1) + 1;
-    sum.loop_invariant(1<=r && r <=11);
-    sum.loop_invariant(implies(0<=x && x<rr, sum(x) == x));
+    sum.invariant(1<=r && r <=11);
+    sum.invariant(implies(0<=x && x<rr, sum(x) == x));
     sum.ensures(implies(0<=x && x<11, sum(x) == x));
     // sum.ensures(implies(1<=x && x<=11, sum(x) == x) && implies(!(1<=x && x<=11), sum(x) == 0));
     // sum.compile_to_pvl("sum_pvl.pvl", {} , "sum", new_target);

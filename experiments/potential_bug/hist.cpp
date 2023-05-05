@@ -43,14 +43,14 @@ int main(int argc, char *argv[]) {
     RDom rx(0, nx);
     Expr bin = clamp(Y(rx, y), 0, 255);
     hist_rows(bin, y) += 1;
-    hist_rows.loop_invariant(hist_rows(x,y) <= rx);
+    hist_rows.invarianthist_rows(x,y) <= rx);
     hist_rows.ensures(hist_rows(x,y) <= nx);
     Func hist("hist");
     hist(x) = 0;
     hist.ensures(hist(x) == 0);
     RDom ry(0, ny);
     hist(x) += hist_rows(x, ry);
-    hist.loop_invariant(hist(x) <= ry*nx);
+    hist.invarianthist(x) <= ry*nx);
     hist.ensures(hist(x) <= ny*nx);
     Func cdf("cdf");
     cdf(x) = hist(0);

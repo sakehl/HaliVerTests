@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   out(x, y) = x + y;
   out.ensures(out(x,y) == x+y);
   out(x,y) += f(r.x, r.y);
-  out.loop_invariant(out(x,y) == x+y+(r.x-1)+(r.y-1)*42);
+  out.invariant(out(x,y) == x+y+(r.x-1)+(r.y-1)*42);
   out.ensures(out(x,y) == x+y+42*7); 
 
   int nx = 100, ny = 42;

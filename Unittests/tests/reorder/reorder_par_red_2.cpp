@@ -1,27 +1,28 @@
 #include "Halide.h"
 #include <stdio.h>
-#include <vector>
 
 using namespace Halide;
 
 int main(int argc, char *argv[]) {
+
   Func f("f"), out("out");
   Var x("x"), y("y");
-  ImageParam input(type_of<int>(), 2, "input");
-  input.requires(input(_0, _1) >= 0);
 
-  out(x, y) = input(y, x) + 1;
-  out.ensures(out(x,y) == input(y, x) + 1);
-  out.ensures(out(x,y) > 0);
+  f(x, y) = 1;
+  f.ensures(f(x, y) == 1);
+  f.compute_root();
 
-  out.reorder(y, x);
-  out.parallel(x);
+  RDom r(1,42, 1, 7, "r");
+  out(x, y) = x + y;
+  out.ensures(out(x,y) == x+y);
+  out(x,y) += f(r.x, r.y);
+  out.invariant(out(x,y) == x+y+(r.x-1)+(r.y-1)*42);
+  out.ensures(out(x,y) == x+y+42*7); 
+
+  out.update().parallel(x).parallel(y);
+  out.update().reorder(x, r.x, y, r.y);
 
   int nx = 100, ny = 42;
-  input.dim(0).set_bounds(0, ny);
-  input.dim(1).set_bounds(0, nx);
-  input.dim(1).set_stride(ny);
-
   out.output_buffer().dim(0).set_bounds(0,nx);
   out.output_buffer().dim(1).set_bounds(0,ny);
   out.output_buffer().dim(1).set_stride(nx);
@@ -35,5 +36,5 @@ int main(int argc, char *argv[]) {
   std::vector<Annotation> pipeline_anns;
 
   std::string name = argv[1];
-  out.compile_to_pvl(name + "_back.pvl" , {input}, pipeline_anns, name, new_target);
+  out.compile_to_pvl(name + "_back.pvl" , {}, pipeline_anns, name, new_target);
 }

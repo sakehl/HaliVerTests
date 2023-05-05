@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
   if((argc > 2 || schedule < 0 || schedule >3) && !front){
     printf("Invallid argument\n");
     return 1;
-  } 
+  }
 
   const int N = 5, CI = 128, CO = 128, W = 100, H = 80;
 
@@ -31,27 +31,18 @@ int main(int argc, char *argv[]) {
 
   Func conv("conv"), relu("relu");  /* LoC 5 */
   RDom r(0, CI, 0, 3, 0, 3);  /* LoC 6 */
-  // input.requires(input(_) >= 0);  /* LoA 1 */
-  input.requires(input(_) == 1);  /* LoA 1 */
+  input.requires(input(_) >= 0);  /* LoA 1 */
   filter.requires(filter(_) >= 0);  /* LoA 2 */
   bias.requires(bias(_) >= 0);  /* LoA 3 */
   
-  // conv(c, x, y, n) = bias(c);  /* LoC 7 */
-  // conv.ensures(conv(c, x, y, n) >= 0);  /* LoA 4 */
-  // conv(c, x, y, n) += filter(c, r.y, r.z, r.x) * input(r.x, x + r.y, y + r.z, n);  /* LoC 8 */
-  // conv.loop_invariant(conv(c, x, y, n) >= 0);  /* LoA 5 */
-  // conv.ensures(conv(c, x, y, n) >= 0);  /* LoA 6 */
-  // conv(x,x,y,n) = bias(c) + filter(c, 0, 0, 0) * input(0, x + 0, y + 0, n);
-  conv(c, x, y, n) = 0;
-  conv.ensures(conv(c, x, y, n) == 0);
-  conv(c, x, y, n) += input(r.x, x + r.y, y + r.z, n);
-  conv.loop_invariant(conv(c, x, y, n) == 128*3*r.z + 128*r.y + r.x);
-  conv.ensures(conv(c, x, y, n) == 128*3*3);
-
+  conv(c, x, y, n) = bias(c);  /* LoC 7 */
+  conv.ensures(conv(c, x, y, n) >= 0);  /* LoA 4 */
+  conv(c, x, y, n) += filter(c, r.y, r.z, r.x) * input(r.x, x + r.y, y + r.z, n);  /* LoC 8 */
+  conv.invariant(conv(c, x, y, n) >= 0);  /* LoA 5 */
+  conv.ensures(conv(c, x, y, n) >= 0);  /* LoA 6 */
 
   // relu(c, x, y, n) = max(0, conv(c, x, y, n));
-  // relu(c, x, y, n) = conv(c, x, y, n);  /* LoC 9 */
-  relu(c, x, y, n) =  bias(c) + filter(c, 0, 0, 0) + conv(c,x,y,n);
+  relu(c, x, y, n) = conv(c, x, y, n);  /* LoC 9 */
   relu.ensures(relu(c, x, y, n) >= 0);  /* LoA 7 */
 
 

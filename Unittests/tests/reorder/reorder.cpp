@@ -34,6 +34,5 @@ int main(int argc, char *argv[]) {
   std::vector<Annotation> pipeline_anns;
 
   std::string name = argv[1];
-  out.translate_to_pvl(name +"_front.pvl", {input}, pipeline_anns); 
   out.compile_to_pvl(name + "_back.pvl" , {input}, pipeline_anns, name, new_target);
 }

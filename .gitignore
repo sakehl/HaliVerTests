@@ -5,3 +5,5 @@
 CLANG Tests/
 
 **/.vscode/
+
+experiments/.ipynb_checkpoints/

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 using namespace Halide;
+using namespace Halide::ConciseCasts;
 
 int main(int argc, char *argv[]) {
     int schedule;
@@ -24,29 +25,29 @@ int main(int argc, char *argv[]) {
     int nx = 1536;
     int ny = 2560;
 
-    ImageParam input(type_of<int>(), 3, "input");
+    ImageParam input(type_of<float>(), 3, "input");
     Var x("x"), y("y"), c("c");
     // Algorithm
     Func Y("Y");
-    Y(x, y) = (299 * input(x, y, 0) +
-               587 * input(x, y, 1) +
-               114 * input(x, y, 2))/1000;
+    Y(x, y) = (0.299f * input(x, y, 0) +
+               0.587f * input(x, y, 1) +
+               0.114f * input(x, y, 2));
 
     Func Cr("Cr");
     Expr R = input(x, y, 0);
-    Cr(x, y) = ((R - Y(x, y)) * 713) / 1000 + 128;
+    Cr(x, y) = ((R - Y(x, y)) * 0.713f) + 128;
 
     Func Cb("Cb");
     Expr B = input(x, y, 2);
-    Cb(x, y) = ((B - Y(x, y)) * 564) / 1000 + 128;
+    Cb(x, y) = ((B - Y(x, y)) * 0.564f) + 128;
 
     Func hist_rows("hist_rows");
     hist_rows(x, y) = 0;
     hist_rows.ensures(hist_rows(x, y) == 0);
     RDom rx(0, nx);
-    Expr bin = clamp(Y(rx, y), 0, 255);
+    Expr bin = cast<int>(clamp(Y(rx, y), 0, 255));
     hist_rows(bin, y) += 1;
-    hist_rows.loop_invariant(hist_rows(x,y) <= rx);
+    hist_rows.invariant(hist_rows(x,y) <= rx);
     hist_rows.ensures(hist_rows(x,y) <= nx);
 
     Func hist("hist");
@@ -54,8 +55,8 @@ int main(int argc, char *argv[]) {
     hist.ensures(hist(x) == 0);
     RDom ry(0, ny);
     hist(x) += hist_rows(x, ry);
-    hist.loop_invariant(hist(x) <= ry*nx);
-    hist.ensures(hist(x) <= ny*nx);
+    hist.invariant(hist(x) <= ry*nx);
+    // hist.ensures(hist(x) <= ny*nx);
 
     Func cdf("cdf");
     cdf(x) = hist(0);
@@ -63,18 +64,17 @@ int main(int argc, char *argv[]) {
     cdf(b.x) = cdf(b.x - 1) + hist(b.x);
 
     Func cdf_bin("cdf_bin");
-    cdf_bin(x, y) = clamp(Y(x, y), 0, 255);
+    cdf_bin(x, y) = u8(clamp(Y(x, y), 0, 255));
 
     Func eq("equalize");
-    eq(x, y) = clamp((cdf(cdf_bin(x, y)) * 255) / (ny * nx), 0, 255);
+    eq(x, y) = clamp((cdf(cdf_bin(x, y)) * 255.0f) / (ny * nx), 0, 255);
 
-    Expr red = clamp((eq(x, y)*1000 + (Cr(x, y) - 128) * 1400)/1000, 0, 255);
-    Expr green = clamp((eq(x, y)*1000 - 343 * (Cb(x, y) - 128) - 711 * (Cr(x, y) - 128))/1000, 0, 255);
-    Expr blue = clamp((eq(x, y)*1000 + 1765 * (Cb(x, y) - 128))/1000, 0, 255);
+    Expr red = clamp((eq(x, y) + (Cr(x, y) - 128) * 1.4f), 0, 255);
+    Expr green = clamp((eq(x, y) - 0.343f * (Cb(x, y) - 128) - 0.711f * (Cr(x, y) - 128)), 0, 255);
+    Expr blue = clamp((eq(x, y) + 1.765f * (Cb(x, y) - 128))/1000, 0, 255);
     Func output("output");
     output(x, y, c) = mux(c, {red, green, blue});
-    //output(x, y, c) = mux(c, {red, Y(x,y), Cb(x,y)});
-    // Estimates (for autoscheduler; ignored otherwise)
+    // Estimates
     {
         input.dim(0).set_bounds(0, 1536);
         input.dim(1).set_bounds(0, 2560);
@@ -116,17 +116,19 @@ int main(int argc, char *argv[]) {
     } else if(schedule == 3){
         int vec = 4;
         Y
-            .clone_in(hist_rows)
-            .compute_at(hist_rows.in(), y)
+            // .clone_in(hist_rows)
+            // .compute_at(hist_rows.in(), y)
             // .vectorize(x, vec)
             ;
 
-        hist_rows.in()
+        hist_rows
+            // .in()
             .compute_root()
             // .vectorize(x, vec)
             .parallel(y, 4)
             ;
-        hist_rows.compute_at(hist_rows.in(), y)
+        hist_rows
+            // .compute_at(hist_rows.in(), y)
             // .vectorize(x, vec)
             .update()
             .reorder(y, rx)

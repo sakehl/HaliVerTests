@@ -21,8 +21,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-
-  // Halide algorithm
+  /* Halide algorithm */
   ImageParam inp(type_of<int>(), 2, "inp"); /* LoC 1 */
   Func blur_x("blur_x"), blur_y("blur_y"); /* LoC 2 */
   Var x("x"), y("y"), xi("xi"), yi("yi"), yo("yo"), yoo("yoo"), xy("xy"); /* LoC 3 */
@@ -31,21 +30,21 @@ int main(int argc, char *argv[]) {
   blur_x.ensures(blur_x(x, y) == (inp(x +2, y) + inp(x, y) + inp(x + 1, y)) / 3); /* LoA 1 */
 
   blur_y(x, y) =  (blur_x(x, y +2) + blur_x(x, y) + blur_x(x, y + 1)) / 3; /* LoC 5 */
-  blur_y.ensures(blur_y(x, y) ==  /* LoA 1 */
+  blur_y.ensures(blur_y(x, y) ==  /* LoA 2 */
         ((inp(x + 2, y + 2) + inp(x, y + 2) + inp(x + 1, y + 2)) / 3
       + (inp(x + 2, y) + inp(x, y) + inp(x + 1, y)) / 3
       + (inp(x + 2, y + 1) + inp(x, y + 1) + inp(x + 1, y + 1)) / 3)/3
     );
   
-  // Halide schedule
+  /* Halide schedule */
   if(schedule == 0){
 
-  } else if(schedule == 1) {
+  } else if(schedule == 1) { /* LoC: 2*/
     blur_y
       .fuse(x,y, xy)
       .parallel(xy)
       ;
-  } else if(schedule == 2) {
+  } else if(schedule == 2) { /* LoC: 6*/
     blur_y
       .split(y, y, yi, 8, TailStrategy::GuardWithIf)
       .split(x, x, xi, 8, TailStrategy::GuardWithIf)
@@ -56,7 +55,7 @@ int main(int argc, char *argv[]) {
     blur_x
       .compute_at(blur_y, x)
       ;
-  } else if(schedule == 3) {
+  } else if(schedule == 3) { /* LoC: 6*/
     blur_y
       .split(y, y, yi, 8, TailStrategy::GuardWithIf)
       .parallel(y)

@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   out(x, y) = x + y;
   out.ensures(out(x,y) == x+y);
   out(x,y) += f(r.x, r.y);
-  out.loop_invariant(out(x,y) == x+y+(r.x-1)+(r.y-1)*42);
+  out.invariant(out(x,y) == x+y+(r.x-1)+(r.y-1)*42);
   out.ensures(out(x,y) == x+y+42*7); 
 
   out.update().reorder(r.x, x, y, r.y);
@@ -35,6 +35,5 @@ int main(int argc, char *argv[]) {
   std::vector<Annotation> pipeline_anns;
 
   std::string name = argv[1];
-  out.translate_to_pvl(name +"_front.pvl", {}, pipeline_anns); 
   out.compile_to_pvl(name + "_back.pvl" , {}, pipeline_anns, name, new_target);
 }
