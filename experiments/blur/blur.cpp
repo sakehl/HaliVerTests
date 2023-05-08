@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
 
   blur_y(x, y) =  (blur_x(x, y +2) + blur_x(x, y) + blur_x(x, y + 1)) / 3; /* LoC 5 */
   blur_y.ensures(blur_y(x, y) ==  /* LoA 2 */
-        ((inp(x + 2, y + 2) + inp(x, y + 2) + inp(x + 1, y + 2)) / 3
-      + (inp(x + 2, y) + inp(x, y) + inp(x + 1, y)) / 3
-      + (inp(x + 2, y + 1) + inp(x, y + 1) + inp(x + 1, y + 1)) / 3)/3
+        ((inp(x + 2, y + 2) + inp(x, y + 2) + inp(x + 1, y + 2)) / 3 /* LoA 3*/
+      + (inp(x + 2, y) + inp(x, y) + inp(x + 1, y)) / 3 /* LoA 4 */
+      + (inp(x + 2, y + 1) + inp(x, y + 1) + inp(x + 1, y + 1)) / 3)/3 /* LoA 5 */
     );
   
   /* Halide schedule */

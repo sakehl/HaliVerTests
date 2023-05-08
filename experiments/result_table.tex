@@ -1,24 +1,29 @@
 \begin{tabular}{l l \vbar \vbar r r \vbar r \vbar r \vbar r r r r \vbar \vbar r}
 \hline Name & & \multicolumn{2}{l\vbar}{\halide} & \multicolumn{1}{l\vbar}{Fr-end} & Sched. & \multicolumn{3}{l}{\pvl} & & LoA \\
 & & LoC & LoA & T. (s) & LoC & LoC & LoA & Loops & T. (s) & incr. \\ \hline \hline
-blur & V0 & 5 & 2 & 12 & 0 & 23 &25 &2 & 24 & 12.5x\\ \hline
- & V1-\{f,p\} & \ditto & \ditto & \ditto &2 &20 &21 &1 & 22 & 10.5x\\ \hline
- & V2-\{c,p,r,s\} & \ditto & \ditto & \ditto &5 &37 &45 &6 &  F & 22.5x\\ \hline
- & V3-\{c,p,s,st\} & \ditto & \ditto & \ditto &6 &43 &50 &7 & T.O. & 25.0x\\ \hline
+blur & V0 & 5 & 5 & 7 & 0 & 23 &29 &2 & 14 & 5.8x\\ \hline
+ & V1-\{f,p\} & \ditto & \ditto & \ditto &2 &20 &24 &1 & 24 & 4.8x\\ \hline
+ & V2-\{c,p,r,s\} & \ditto & \ditto & \ditto &6 &37 &49 &6 & 59 & 9.8x\\ \hline
+ & V3-\{c,p,s,st\} & \ditto & \ditto & \ditto &6 &43 &55 &7 & 41 & 11.0x\\ \hline
 \hline
-hist & V0 & 29 & 6 & 12 & 0 & 75 &57 &11 & 35 & 9.5x\\ \hline
- & V1-\{c,p,r,u\} & \ditto & \ditto & \ditto &4 &81 &58 &11 & T.O. & 9.7x\\ \hline
- & V2-\{c,p,r,u\} & \ditto & \ditto & \ditto &6 &76 &73 &13 & 70 & 12.2x\\ \hline
- & V3-\{c,cl,p,r,s,u\} & \ditto & \ditto & \ditto &16 &87 &84 &17 & 110 & 14.0x\\ \hline
+hist & V0 & 29 & 6 & 7 & 0 & 73 &68 &11 & 22 & 11.3x\\ \hline
+ & V1-\{c,p,r,u\} & \ditto & \ditto & \ditto &4 &79 &69 &11 & 38 & 11.5x\\ \hline
+ & V2-\{c,p,r,u\} & \ditto & \ditto & \ditto &6 &75 &75 &13 & 43 & 12.5x\\ \hline
+ & V3-\{c,p,r,s,u\} & \ditto & \ditto & \ditto &13 &66 &77 &13 & 73 & 12.8x\\ \hline
 \hline
-conv\_ & V0 & 9 & 7 & 14 & 0 & 67 &101 &7 & 44 & 14.4x\\ \hline
-layer & V1-\{c,f,p,u\} & \ditto & \ditto & \ditto &4 &70 &101 &8 & 52 & 14.4x\\ \hline
- & V2-\{p,r,s,u\} & \ditto & \ditto & \ditto &6 &79 &120 &10 & 76 & 17.1x\\ \hline
- & V3-\{c,p,r,s,u\} & \ditto & \ditto & \ditto &15 &71 &100 &7 & T.O. & 14.3x\\ \hline
+conv\_ & V0 & 9 & 7 & 6 & 0 & 67 &130 &7 & 35 & 18.6x\\ \hline
+layer & V1-\{c,f,p,u\} & \ditto & \ditto & \ditto &4 &70 &127 &8 & 48 & 18.1x\\ \hline
+ & V2-\{p,r,s,u\} & \ditto & \ditto & \ditto &6 &79 &157 &10 & 185 & 22.4x\\ \hline
+ & V3-\{c,p,r,s,u\} & \ditto & \ditto & \ditto &15 &71 &130 &7 & 153 & 18.6x\\ \hline
 \hline
-gemm & V0 & 18 & 6 & 17 & 0 & 43 &61 &3 & 56 & 10.2x\\ \hline
- & V1-\{c,p,r,s\} & \ditto & \ditto & \ditto &8 &64 &114 &10 & T.O. & 19.0x\\ \hline
- & V2-\{c,p,r,s,u\} & \ditto & \ditto & \ditto &19 &121 &255 &26 & T.O. & 42.5x\\ \hline
- & V3-\{c,f,p,r,s,u\} & \ditto & \ditto & \ditto &23 &156 &352 &31 & T.O. & 58.7x\\ \hline
+gemm & V0 & 18 & 9 & 8 & 0 & 43 &78 &3 & 22 & 8.7x\\ \hline
+ & V1-\{c,p,r,s\} & \ditto & \ditto & \ditto &8 &64 &137 &10 & 242 & 15.2x\\ \hline
+ & V2-\{c,p,r,s,u\} & \ditto & \ditto & \ditto &19 &121 &228 &26 &  F & 25.3x\\ \hline
+ & V3-\{c,f,p,r,s,u\} & \ditto & \ditto & \ditto &24 &156 &276 &31 &  F & 30.7x\\ \hline
+\hline
+auto\_ & V0 & 33 & 17 & 7 & 0 & 142 &213 &23 & 70 & 12.5x\\ \hline
+viz & V1-\{c\} & \ditto & \ditto & \ditto &9 &117 &174 &23 & 107 & 10.2x\\ \hline
+ & V2-\{c,p,s\} & \ditto & \ditto & \ditto &12 &131 &199 &27 & 179 & 11.7x\\ \hline
+ & V3-\{c,p,r,s\} & \ditto & \ditto & \ditto &21 &136 &193 &25 & 236 & 11.4x\\ \hline
 \hline
 \end{tabular}

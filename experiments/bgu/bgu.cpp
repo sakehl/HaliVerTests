@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 using namespace Halide;
+using Halide::ConciseCasts::f32;
+using Halide::ConciseCasts::i32;
 
 Var x("x"), y("y"), z("z"), c("c");
 
@@ -257,12 +259,17 @@ int main(int argc, char *argv[]) {
     slice_loc.dim(2).set_bounds(0, 3);
     
 
-    Expr upsample_factor_x = 1536 / 192;
-    Expr upsample_factor_y = 2560 / 320;
-    Expr upsample_factor = max(upsample_factor_x, upsample_factor_y);
-
+    // Add a boundary condition to the inputs.
     Func clamped_values = BoundaryConditions::repeat_edge(values);
     Func clamped_splat_loc = BoundaryConditions::repeat_edge(splat_loc);
+
+    // Figure out how much we're upsampling by. Not relevant if we're
+    // just fitting curves.
+    Expr upsample_factor_x =
+        i32(ceil(f32(slice_loc.width()) / splat_loc.width()));
+    Expr upsample_factor_y =
+        i32(ceil(f32(slice_loc.height()) / splat_loc.height()));
+    Expr upsample_factor = max(upsample_factor_x, upsample_factor_y);
 
     Func gray_splat_loc;
     gray_splat_loc(x, y) = (0.25f * clamped_splat_loc(x, y, 0) +
@@ -274,6 +281,7 @@ int main(int argc, char *argv[]) {
                             0.5f * slice_loc(x, y, 1) +
                             0.25f * slice_loc(x, y, 2));
 
+    // Construct the bilateral grid
     Func histogram("histogram");
     RDom r(0, s_sigma, 0, s_sigma);
     {
@@ -292,17 +300,23 @@ int main(int argc, char *argv[]) {
 
         histogram(x, y, zi, c) +=
             pack_channels(c,
-                        {sr * sr, sr * sg, sr * sb, sr,
-                        sg * sg, sg * sb, sg,
-                        sb * sb, sb,
-                        1.0f,
-                        vr * sr, vr * sg, vr * sb, vr,
-                        vg * sr, vg * sg, vg * sb, vg,
-                        vb * sr, vb * sg, vb * sb, vb});
+                            {sr * sr, sr * sg, sr * sb, sr,
+                            sg * sg, sg * sb, sg,
+                            sb * sb, sb,
+                            1.0f,
+                            vr * sr, vr * sg, vr * sb, vr,
+                            vg * sr, vg * sg, vg * sb, vg,
+                            vb * sr, vb * sg, vb * sb, vb});
     }
 
+    // Convolution pyramids (Farbman et al.) suggests convolving by
+    // something 1/d^3-like to get an interpolating membrane, so we do
+    // that. We could also just use a convolution pyramid here, but
+    // these grids are really small, so it's OK for the filter to drop
+    // sharply and truncate early.
     Expr t0 = 1.0f / 64, t1 = 1.0f / 27, t2 = 1.0f / 8, t3 = 1.0f;
 
+    // Blur the grid using a seven-tap filter
     Func blurx("blurx"), blury("blury"), blurz("blurz");
 
     blurz(x, y, z, c) = (histogram(x, y, z - 3, c) * t0 +
@@ -327,6 +341,8 @@ int main(int argc, char *argv[]) {
                             blury(x + 2, y, z, c) * t1 +
                             blury(x + 3, y, z, c) * t0);
 
+    // Do the solve, to convert the accumulated values to the affine
+    // matrices.
     Func line("line");
     {
         // Pull out the 4x4 symmetric matrix from the values we've
@@ -399,7 +415,7 @@ int main(int argc, char *argv[]) {
         b(2, 2) += weighted_lambda * gain;
 
         // Now solve Ax = b
-        Matrix<3, 4> result = transpose(solve_symmetric(A, b, line, x, false));
+        Matrix<3, 4> result = transpose(solve_symmetric(A, b, line, x, true));
 
         // Pack the resulting matrix into the output Func.
         line(x, y, z, c) = pack_channels(c, {result(0, 0),
@@ -416,17 +432,81 @@ int main(int argc, char *argv[]) {
                                                 result(2, 3)});
     }
 
+    // If using the shader we stop there, and the Func "line" is the
+    // output. We also compile a more convenient but slower version
+    // that does the trilerp and evaluates the model inside the same
+    // Halide pipeline.
+
+    // We'll take trilinear samples to compute the output. We factor
+    // this into several stages to make better use of SIMD.
+    Func interpolated("interpolated");
+    Func slice_loc_z("slice_loc_z");
+    Func interpolated_matrix_x("interpolated_matrix_x");
+    Func interpolated_matrix_y("interpolated_matrix_y");
+    Func interpolated_matrix_z("interpolated_matrix_z");
+    {
+        // Spatial bin size in the high-res image.
+        Expr big_sigma = s_sigma * upsample_factor;
+
+        // Upsample the matrices in x and y.
+        Expr yf = cast<float>(y) / big_sigma;
+        Expr yi = cast<int>(floor(yf));
+        yf -= yi;
+        interpolated_matrix_y(x, y, z, c) =
+            lerp(line(x, yi, z, c),
+                    line(x, yi + 1, z, c),
+                    yf);
+
+        Expr xf = cast<float>(x) / big_sigma;
+        Expr xi = cast<int>(floor(xf));
+        xf -= xi;
+        interpolated_matrix_x(x, y, z, c) =
+            lerp(interpolated_matrix_y(xi, y, z, c),
+                    interpolated_matrix_y(xi + 1, y, z, c),
+                    xf);
+
+        // Sample it along the z direction using intensity.
+        Expr num_intensity_bins = cast<int>(1.0f / r_sigma);
+        Expr val = gray_slice_loc(x, y);
+        val = clamp(val, 0.0f, 1.0f);
+        Expr zv = val * num_intensity_bins;
+        Expr zi = cast<int>(zv);
+        Expr zf = zv - zi;
+        slice_loc_z(x, y) = {zi, zf};
+
+        interpolated_matrix_z(x, y, c) =
+            lerp(interpolated_matrix_x(x, y, slice_loc_z(x, y)[0], c),
+                    interpolated_matrix_x(x, y, slice_loc_z(x, y)[0] + 1, c),
+                    slice_loc_z(x, y)[1]);
+
+        // Multiply by 3x4 by 4x1.
+        interpolated(x, y, c) =
+            (interpolated_matrix_z(x, y, 4 * c + 0) * slice_loc(x, y, 0) +
+                interpolated_matrix_z(x, y, 4 * c + 1) * slice_loc(x, y, 1) +
+                interpolated_matrix_z(x, y, 4 * c + 2) * slice_loc(x, y, 2) +
+                interpolated_matrix_z(x, y, 4 * c + 3));
+    }
+
+    // Normalize
+    Func slice("slice");
+    slice(x, y, c) = clamp(interpolated(x, y, c), 0.0f, 1.0f);
+
+    Func output = line;
+
     Target target = Target();
     Target new_target = target
         .with_feature(Target::NoAsserts)
         .with_feature(Target::NoBoundsQuery)
         ;
 
-    OutputImageParam output = line.output_buffer();
-    output.dim(0).set_bounds(0, 1536);
-    output.dim(1).set_bounds(0, 2560);
-    output.dim(2).set_bounds(0, 3);
+    // output.output_buffer()
 
-    // line.compile_to_pvl("bgu_pvl.pvl", {splat_loc, values, slice_loc}, "bgu", new_target);
-    line.translate_to_pvl("bgu_front_pvl.pvl", {}, {}); 
+    OutputImageParam outputb = output.output_buffer();
+    outputb.dim(0).set_bounds(0, 1536);
+    outputb.dim(1).set_bounds(0, 2560);
+    outputb.dim(2).set_bounds(0, 3);
+
+    output.compile_to_pvl("bgu_pvl.pvl", {splat_loc, values, slice_loc}, {}, "bgu", new_target);
+    // output.translate_to_pvl("bgu_front_pvl.pvl", {}, {});
+    // slice.translate_to_pvl("bgu_front_pvl.pvl", {}, {}); 
 }

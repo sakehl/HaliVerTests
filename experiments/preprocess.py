@@ -260,11 +260,15 @@ class Experiments:
                     shortname = name
                     if name == 'conv_layer':
                         shortname = 'conv\_'
+                    if name == 'auto_viz':
+                        shortname = 'auto\_'
                     t, passes, failt, fils, timeouts = get_average(self.verification_times[name]['front'])
                     row += f"{shortname} & V{v} & {halideLoC[name]} & {halideAnn[name]} & {round(t)} & 0 & "
                 else:
                     if name == 'conv_layer' and v == self.versions[name][1]:
                         row += "layer"
+                    if name == 'auto_viz' and v == self.versions[name][1]:
+                        row += "viz"
                     row += f" & V{v}-{directivesUsed[name][v]} & \ditto & \ditto & \ditto &"
                     row += f"{scheduleLoC[name][v]} &"
                     

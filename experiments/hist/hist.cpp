@@ -25,56 +25,58 @@ int main(int argc, char *argv[]) {
     int nx = 1536;
     int ny = 2560;
 
-    ImageParam input(type_of<float>(), 3, "input");
-    Var x("x"), y("y"), c("c");
+    ImageParam input(type_of<float>(), 3, "input"); /* LoC 1 */
+    input.requires(input(_) >= 0.0f && input(_) <= 255.0f); /* LoA 1 */
+    Var x("x"), y("y"), c("c"); /* LoC 2 */
     // Algorithm
-    Func Y("Y");
-    Y(x, y) = (0.299f * input(x, y, 0) +
-               0.587f * input(x, y, 1) +
-               0.114f * input(x, y, 2));
+    Func Y("Y"); /* LoC 3 */
+    Y(x, y) = (0.299f * input(x, y, 0) + /* LoC 4 */
+               0.587f * input(x, y, 1) + /* LoC 5 */
+               0.114f * input(x, y, 2)); /* LoC 6 */
 
-    Func Cr("Cr");
-    Expr R = input(x, y, 0);
-    Cr(x, y) = ((R - Y(x, y)) * 0.713f) + 128;
+    Func Cr("Cr"); /* LoC 7 */
+    Expr R = input(x, y, 0); /* LoC 8 */
+    Cr(x, y) = ((R - Y(x, y)) * 0.713f) + 128; /* LoC 9 */
+    Cr.ensures(Cr(x,y) >= 0.0f && Cr(x,y) < 256.0f); /* LoA 2 */
 
-    Func Cb("Cb");
-    Expr B = input(x, y, 2);
-    Cb(x, y) = ((B - Y(x, y)) * 0.564f) + 128;
+    Func Cb("Cb"); /* LoC 10 */
+    Expr B = input(x, y, 2); /* LoC 11 */
+    Cb(x, y) = ((B - Y(x, y)) * 0.564f) + 128; /* LoC 12 */
+    Cb.ensures(Cb(x,y) >= 0.0f && Cb(x,y) < 256.0f); /* LoA 3 */
 
-    Func hist_rows("hist_rows");
-    hist_rows(x, y) = 0;
-    hist_rows.ensures(hist_rows(x, y) == 0);
-    RDom rx(0, nx);
-    Expr bin = cast<int>(clamp(Y(rx, y), 0, 255));
-    hist_rows(bin, y) += 1;
-    hist_rows.invariant(hist_rows(x,y) <= rx);
-    hist_rows.ensures(hist_rows(x,y) <= nx);
+    Func hist_rows("hist_rows"); /* LoC 13 */
+    hist_rows(x, y) = 0; /* LoC 14 */
+    hist_rows.ensures(hist_rows(x, y) == 0); /* LoA 4 */
+    RDom rx(0, nx); /* LoC 15 */
+    Expr bin = cast<int>(clamp(Y(rx, y), 0, 255)); /* LoC 16 */
+    hist_rows(bin, y) += 1; /* LoC 17 */
+    hist_rows.invariant(hist_rows(x,y) <= rx); /* LoA 5 */
 
-    Func hist("hist");
-    hist(x) = 0;
-    hist.ensures(hist(x) == 0);
-    RDom ry(0, ny);
-    hist(x) += hist_rows(x, ry);
-    hist.invariant(hist(x) <= ry*nx);
-    // hist.ensures(hist(x) <= ny*nx);
+    Func hist("hist"); /* LoC 18 */
+    hist(x) = 0; /* LoC 19 */
+    hist.ensures(hist(x) == 0); /* LoA 6 */
+    RDom ry(0, ny); /* LoC 20 */
+    hist(x) += hist_rows(x, ry); /* LoC 21 */
+    hist.invariant(hist(x) <= ry*nx); /* LoA 6 */
 
-    Func cdf("cdf");
-    cdf(x) = hist(0);
-    RDom b(1, 255);
-    cdf(b.x) = cdf(b.x - 1) + hist(b.x);
+    Func cdf("cdf"); /* LoC 22 */
+    cdf(x) = hist(0); /* LoC 23 */
+    RDom b(1, 255); /* LoC 24 */
+    cdf(b.x) = cdf(b.x - 1) + hist(b.x); /* LoC 25 */
 
-    Func cdf_bin("cdf_bin");
-    cdf_bin(x, y) = u8(clamp(Y(x, y), 0, 255));
+    Func cdf_bin("cdf_bin"); /* LoC 26 */
+    cdf_bin(x, y) = u8(clamp(Y(x, y), 0, 255)); /* LoC 27 */
 
-    Func eq("equalize");
-    eq(x, y) = clamp((cdf(cdf_bin(x, y)) * 255.0f) / (ny * nx), 0, 255);
+    Func eq("equalize"); /* LoC 28 */
+    eq(x, y) = clamp((cdf(cdf_bin(x, y)) * 255.0f) / (ny * nx), 0, 255); /* LoC 29 */
 
-    Expr red = clamp((eq(x, y) + (Cr(x, y) - 128) * 1.4f), 0, 255);
-    Expr green = clamp((eq(x, y) - 0.343f * (Cb(x, y) - 128) - 0.711f * (Cr(x, y) - 128)), 0, 255);
-    Expr blue = clamp((eq(x, y) + 1.765f * (Cb(x, y) - 128))/1000, 0, 255);
-    Func output("output");
-    output(x, y, c) = mux(c, {red, green, blue});
-    // Estimates
+    Expr red = clamp((eq(x, y) + (Cr(x, y) - 128) * 1.4f), 0, 255); /* LoC 30 */
+    Expr green = clamp((eq(x, y) - 0.343f * (Cb(x, y) - 128) - 0.711f * (Cr(x, y) - 128)), 0, 255); /* LoC 31 */
+    Expr blue = clamp((eq(x, y) + 1.765f * (Cb(x, y) - 128))/1000, 0, 255); /* LoC 32 */
+    Func output("output"); /* LoC 33 */
+    output(x, y, c) = mux(c, {red, green, blue}); /* LoC 34 */
+    output.ensures(output(x, y, c) >= 0 && output(x, y, c)<=255); /* LoA 6 */
+    // Bounds
     {
         input.dim(0).set_bounds(0, 1536);
         input.dim(1).set_bounds(0, 2560);
@@ -95,7 +97,7 @@ int main(int argc, char *argv[]) {
     // Schedule
     if(schedule == 0){
 
-    } else if(schedule == 1){
+    } else if(schedule == 1){  /* LoC 4 */
 
         eq.compute_at(output, y);
 
@@ -103,7 +105,7 @@ int main(int argc, char *argv[]) {
             .unroll(c)
             .parallel(y)
             ;
-    } else if(schedule == 2){
+    } else if(schedule == 2){  /* LoC 6 */
         Y.compute_root();
         eq.compute_root();
         hist.compute_root();
@@ -113,33 +115,19 @@ int main(int argc, char *argv[]) {
             .unroll(c)
             .parallel(y)
             ;
-    } else if(schedule == 3){
+    } else if(schedule == 3){  /* LoC 13 */
         int vec = 4;
-        Y
-            // .clone_in(hist_rows)
-            // .compute_at(hist_rows.in(), y)
-            // .vectorize(x, vec)
-            ;
-
         hist_rows
-            // .in()
             .compute_root()
-            // .vectorize(x, vec)
-            .parallel(y, 4)
+            .parallel(y, 4) // Combination of split and parallel
             ;
         hist_rows
-            // .compute_at(hist_rows.in(), y)
-            // .vectorize(x, vec)
             .update()
             .reorder(y, rx)
-            // .unroll(y)
             ;
         hist.compute_root()
-            // .vectorize(x, vec)
             .update()
             .reorder(x, ry)
-            // .vectorize(x, vec)
-            // .unroll(x, 4)
             .parallel(x)
             .reorder(ry, x)
             ;
@@ -147,9 +135,7 @@ int main(int argc, char *argv[]) {
         cdf.compute_root();
         output.reorder(c, x, y)
             .unroll(c)
-            .parallel(y, 8)
-            // .vectorize(x, vec * 2)
-            // .unroll(x, vec*2)
+            .parallel(y, 8) // Combination of split and parallel
             ;
     } else if(schedule == 4){
         const int vec = 4; ///natural_vector_size<float>();

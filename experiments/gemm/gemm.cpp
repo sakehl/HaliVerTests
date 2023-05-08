@@ -118,8 +118,7 @@ int main(int argc, char *argv[]) {
         .unroll(j)
         .bound_extent(i, s)
         ;
-    // result_.print_loop_nest();
-  } else if(schedule == 3) { /* LoC: 23 */
+  } else if(schedule == 3) { /* LoC: 24 */
     result_.tile(i, j, ti[1], tj[1], i, j, 2 * s, 2 * s, TailStrategy::GuardWithIf);
     result_
         .tile(i, j, ii, ji, s, 4)
@@ -130,7 +129,8 @@ int main(int argc, char *argv[]) {
 
 
     result_.rename(tj[0], t);
-    result_.bound(i, 0, num_rows).bound(j, 0, num_cols);
+    result_.bound(i, 0, num_rows)
+      .bound(j, 0, num_cols);
 
     As.compute_root()
         .split(j, jo, ji, s)

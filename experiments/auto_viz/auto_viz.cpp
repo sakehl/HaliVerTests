@@ -28,102 +28,98 @@ int main(int argc, char *argv[]) {
     bool upsample = scale_factor > 1.0;
     int new_nx = nx * scale_factor;
     int new_ny = ny * scale_factor;
-    printf("New x: %d and new y %d\n", new_nx, new_ny);
 
     /* Halide algorithm */
-    ImageParam input(type_of<float>(), 3, "input");
+    ImageParam input(type_of<float>(), 3, "input"); /* LoC 1 */
     // Common Vars
-    Var x("x"), y("y"), c("c"), k("k");
-    Var xi("xi"), yi("yi");
+    Var x("x"), y("y"), c("c"), k("k"); /* LoC 2 */
+    Var xi("xi"), yi("yi"); /* LoC 3 */
 
     // Intermediate Funcs
-    Func as_float("as_float"), clamped("clamped"), resized_x("resized_x"), resized_y("resized_y"),
-        unnormalized_kernel_x("unnormalized_kernel_x"), unnormalized_kernel_y("unnormalized_kernel_y"),
-        kernel_x("kernel_x"), kernel_y("kernel_y"),
-        kernel_sum_x("kernel_sum_x"), kernel_sum_y("kernel_sum_y");
-    Func output("output");
+    Func as_float("as_float"), clamped("clamped"), resized_x("resized_x"), resized_y("resized_y"), /* LoC 4 */
+        unnormalized_kernel_x("unnormalized_kernel_x"), unnormalized_kernel_y("unnormalized_kernel_y"), /* LoC 5 */
+        kernel_x("kernel_x"), kernel_y("kernel_y"), /* LoC 6 */
+        kernel_sum_x("kernel_sum_x"), kernel_sum_y("kernel_sum_y"); /* LoC 7 */
+    Func output("output"); /* LoC 8 */
 
     input.requires(input(_) >= 0.0f);
-    clamped = Halide::BoundaryConditions::repeat_edge(input);
+    clamped = Halide::BoundaryConditions::repeat_edge(input); /* LoC 9 */
     // Handle different types by just casting to float
-    as_float(x, y, c) = cast<float>(clamped(x, y, c));
+    as_float(x, y, c) = cast<float>(clamped(x, y, c)); /* LoC 10 */
     as_float.ensures(as_float(x, y, c) >= 0.0f);
 
-    Expr kernel_scaling = upsample ? Expr(1.0f) : scale_factor;
+    Expr kernel_scaling = upsample ? Expr(1.0f) : scale_factor; /* LoC 11 */
 
-    Expr kernel_radius = 0.5f / kernel_scaling;
+    Expr kernel_radius = 0.5f / kernel_scaling; /* LoC 12 */
 
-    Expr kernel_taps = cast<int>(ceil(1.0f / kernel_scaling)); 
+    Expr kernel_taps = cast<int>(ceil(1.0f / kernel_scaling));  /* LoC 13 */
 
     // source[xy] are the (non-integer) coordinates inside the source image
-    Expr sourcex = (x + 0.5f) / scale_factor - 0.5f;
-    Expr sourcey = (y + 0.5f) / scale_factor - 0.5f;
+    Expr sourcex = (x + 0.5f) / scale_factor - 0.5f; /* LoC 14 */
+    Expr sourcey = (y + 0.5f) / scale_factor - 0.5f; /* LoC 15 */
 
     // Initialize interpolation kernels. Since we allow an arbitrary
     // scaling factor, the filter coefficients are different for each x
     // and y coordinate.
-    Expr beginx = cast<int>(ceil(sourcex - kernel_radius));
-    Expr beginy = cast<int>(ceil(sourcey - kernel_radius));
+    Expr beginx = cast<int>(ceil(sourcex - kernel_radius)); /* LoC 16 */
+    Expr beginy = cast<int>(ceil(sourcey - kernel_radius)); /* LoC 17 */
 
-    RDom r(0, kernel_taps);
+    RDom r(0, kernel_taps); /* LoC 18 */
 
-    auto kernel = [](Expr x) -> Expr {
-        Expr xx = abs(x);
-        return select(abs(x) <= 0.5f, 1.0f, 0.0f);
-    };
-    unnormalized_kernel_x(x, k) = kernel((k + beginx - sourcex) * kernel_scaling);
-    unnormalized_kernel_x.ensures(implies(k == 0, unnormalized_kernel_x(x, k) == 1.0f));
-    unnormalized_kernel_x.ensures(unnormalized_kernel_x(x, k) >= 0.0f);
-    unnormalized_kernel_y(y, k) = kernel((k + beginy - sourcey) * kernel_scaling);
-    unnormalized_kernel_y.ensures(implies(k == 0, unnormalized_kernel_y(y, k) == 1.0f));
-    unnormalized_kernel_y.ensures(unnormalized_kernel_y(y, k) >= 0.0f);
+    auto kernel = [](Expr x) -> Expr { /* LoC 19 */
+        Expr xx = abs(x); /* LoC 20 */
+        return select(abs(x) <= 0.5f, 1.0f, 0.0f); /* LoC 21 */
+    }; /* LoC 23 */
+    unnormalized_kernel_x(x, k) = kernel((k + beginx - sourcex) * kernel_scaling); /* LoC 24 */
+    unnormalized_kernel_x.ensures(implies(k == 0, unnormalized_kernel_x(x, k) == 1.0f)); /* LoA 1 */
+    unnormalized_kernel_x.ensures(unnormalized_kernel_x(x, k) >= 0.0f); /* LoA 2 */
+    unnormalized_kernel_y(y, k) = kernel((k + beginy - sourcey) * kernel_scaling); /* LoC 25 */
+    unnormalized_kernel_y.ensures(implies(k == 0, unnormalized_kernel_y(y, k) == 1.0f)); /* LoA 3 */
+    unnormalized_kernel_y.ensures(unnormalized_kernel_y(y, k) >= 0.0f); /* LoA 4 */
 
-    unnormalized_kernel_x.compute_root();
-    unnormalized_kernel_y.compute_root();
+    std::function<Expr(Expr)> biggerThanZero = [](Expr f) -> Expr { /* LoA 5 */
+        return f >= 0.0f; /* LoA 6 */
+    }; /* LoA 7 */
 
-    std::function<Expr(Expr)> biggerThanZero = [](Expr f) -> Expr {
-        return f >= 0.0f;
-    };
+    std::function<Expr(Expr)> biggerThanOne = [r](Expr f) -> Expr { /* LoA 8 */
+        return implies(r>0, f >= 1.0f); /* LoA 9 */
+    }; /* LoA 10 */
 
-    std::function<Expr(Expr)> biggerThanOne = [r](Expr f) -> Expr {
-        return implies(r>0, f >= 1.0f);
-    };
+    kernel_sum_x(x) = sum(unnormalized_kernel_x(x, r), "kernel_sum_x", {biggerThanZero, biggerThanOne}); /* LoC 26 */
+    kernel_sum_x.ensures(kernel_sum_x(x) >= 1.0f); /* LoA 11 */
+    kernel_sum_y(y) = sum(unnormalized_kernel_y(y, r), "kernel_sum_y", {biggerThanZero, biggerThanOne}); /* LoC 27 */
+    kernel_sum_y.ensures(kernel_sum_y(y) >= 1.0f); /* LoA 12 */
 
-    kernel_sum_x(x) = sum(unnormalized_kernel_x(x, r), "kernel_sum_x", {biggerThanZero, biggerThanOne});
-    kernel_sum_x.ensures(kernel_sum_x(x) >= 1.0f);
-    kernel_sum_y(y) = sum(unnormalized_kernel_y(y, r), "kernel_sum_y", {biggerThanZero, biggerThanOne});
-    kernel_sum_y.ensures(kernel_sum_y(y) >= 1.0f);
-
-    kernel_x(x, k) = unnormalized_kernel_x(x, k) / kernel_sum_x(x);
-    kernel_x.ensures(kernel_x(x, k) >= 0.0f);
-    kernel_y(y, k) = unnormalized_kernel_y(y, k) / kernel_sum_y(y);
-    kernel_y.ensures(kernel_y(y, k) >= 0.0f);
+    kernel_x(x, k) = unnormalized_kernel_x(x, k) / kernel_sum_x(x); /* LoC 28 */
+    kernel_x.ensures(kernel_x(x, k) >= 0.0f); /* LoA 13 */
+    kernel_y(y, k) = unnormalized_kernel_y(y, k) / kernel_sum_y(y); /* LoC 29 */
+    kernel_y.ensures(kernel_y(y, k) >= 0.0f); /* LoA 14 */
 
     // Perform separable resizing. The resize in x vectorizes
     // poorly compared to the resize in y, so do it first if we're
     // upsampling, and do it second if we're downsampling.
     Func resized;
     if (upsample) {
-        resized_x(x, y, c) = sum(kernel_x(x, r) * as_float(r + beginx, y, c), "resized_x", {biggerThanZero});
-        resized_x.ensures(resized_x(x,y,c) >= 0.0f);
-        resized_y(x, y, c) = sum(kernel_y(y, r) * resized_x(x, r + beginy, c), "resized_y", {biggerThanZero});
-        resized_y.ensures(resized_y(x,y,c) >= 0.0f);
-        resized = resized_y;
+        resized_x(x, y, c) = sum(kernel_x(x, r) * as_float(r + beginx, y, c), "resized_x", {biggerThanZero}); /* LoC 30 */
+        resized_x.ensures(resized_x(x,y,c) >= 0.0f); /* LoA 15 */
+        resized_y(x, y, c) = sum(kernel_y(y, r) * resized_x(x, r + beginy, c), "resized_y", {biggerThanZero}); /* LoC 31 */
+        resized_y.ensures(resized_y(x,y,c) >= 0.0f); /* LoA 16 */
+        resized = resized_y; /* LoC 32 */
     } else {
-        resized_y(x, y, c) = sum(kernel_y(y, r) * as_float(x, r + beginy, c), "resized_y", {biggerThanZero});
-        resized_y.ensures(resized_y(x,y,c) >= 0.0f);
-        resized_x(x, y, c) = sum(kernel_x(x, r) * resized_y(r + beginx, y, c), "resized_x", {biggerThanZero});
-        resized_x.ensures(resized_x(x,y,c) >= 0.0f);
-        resized = resized_x;
+        resized_y(x, y, c) = sum(kernel_y(y, r) * as_float(x, r + beginy, c), "resized_y", {biggerThanZero}); /* LoC 30 */
+        resized_y.ensures(resized_y(x,y,c) >= 0.0f); /* LoA 15 */
+        resized_x(x, y, c) = sum(kernel_x(x, r) * resized_y(r + beginx, y, c), "resized_x", {biggerThanZero}); /* LoC 31 */
+        resized_x.ensures(resized_x(x,y,c) >= 0.0f); /* LoA 16 */
+        resized = resized_x; /* LoC 32 */
     }
 
     if (input.type().is_float()) {
-        output(x, y, c) = clamp(resized(x, y, c), 0.0f, 1.0f);
+        output(x, y, c) = clamp(resized(x, y, c), 0.0f, 1.0f); /* LoC 33 */
     } else {
-        output(x, y, c) = saturating_cast(input.type(), resized(x, y, c));
+        output(x, y, c) = saturating_cast(input.type(), resized(x, y, c)); /* LoC 33 */
     }
 
-    output.ensures(output(x, y, c) >= 0.0f);
+    output.ensures(output(x, y, c) >= 0.0f); /* LoA 17 */
 
     // Bounding the dimensions
     
@@ -149,7 +145,7 @@ int main(int argc, char *argv[]) {
         ;
 
     // Schedule
-    if (schedule ==  1) {
+    if (schedule ==  1) { /* LoC: 9*/
         // naive: compute_root() everything
         unnormalized_kernel_x
             .compute_root();
@@ -169,7 +165,7 @@ int main(int argc, char *argv[]) {
             .compute_root();
         output
             .compute_root();
-    } else if (schedule ==  2) {
+    } else if (schedule ==  2) { /* LoC: 12*/
         // less-naive: add vectorization and parallelism to 'large' realizations;
         // use compute_at for as_float calculation
         unnormalized_kernel_x
@@ -194,8 +190,9 @@ int main(int argc, char *argv[]) {
         output
             .compute_root()
             .parallel(y)
-            .parallel(x,8); //vectorize(x, 8);
-    } else if (schedule ==  3) {
+            // Split plus make inner dim parallel
+            .parallel(x,8); //vectorize(x, 8); 
+    } else if (schedule ==  3) { /* LoC: 21*/
         // complex: use compute_at() and tiling intelligently.
         unnormalized_kernel_x
             .compute_at(kernel_x, x)

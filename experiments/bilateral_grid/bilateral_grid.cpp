@@ -18,25 +18,18 @@ int main(int argc, char *argv[]) {
     Var x("x"), y("y"), z("z"), c("c"); 
 
     // Add a boundary condition
-    // Func clamped = BoundaryConditions::repeat_edge(input);
-    Func clamped = input;
+    Func clamped = BoundaryConditions::repeat_edge(input);
 
     // Construct the bilateral grid
     RDom r(0, s_sigma, 0, s_sigma);
     Expr val = clamp(clamped(x * s_sigma + r.x - s_sigma / 2, y * s_sigma + r.y - s_sigma / 2), 0.0f, 1.0f);
-    // val = clamp(val, 0.0f, 1.0f);
-    // val = clamp(val, 0, 100);
+    val = clamp(val, 0.0f, 1.0f);
 
     Expr zi = cast<int>(val * (1.0f / r_sigma) + 0.5f);
-    // Expr zi = (val / r_sigma) + 50;
 
     Func histogram("histogram");
     histogram(x, y, z, c) = 0.0f;
-    // histogram(x, y, z, c) = 0;
-    // histogram(x, y, zi, c) += mux(c, {val, 1.0f});
-    histogram(x, y, zi, c) += 
-        select(c==0, val,
-               100);
+    histogram(x, y, zi, c) += mux(c, {val, 1.0f});
 
     // Blur the grid using a five-tap filter
     Func blurx("blurx"), blury("blury"), blurz("blurz");
@@ -58,11 +51,8 @@ int main(int argc, char *argv[]) {
 
     // Take trilinear samples to compute the output
     val = clamp(input(x, y), 0.0f, 1.0f);
-    // val = clamp(input(x, y), 0, 100);
     Expr zv = val * (1.0f / r_sigma);
-    // Expr zv = val / r_sigma;
     zi = cast<int>(zv);
-    // zi = zv;
     Expr zf = zv - zi;
     Expr xf = cast<float>(x % s_sigma) / s_sigma;
     Expr yf = cast<float>(y % s_sigma) / s_sigma;
@@ -92,7 +82,7 @@ int main(int argc, char *argv[]) {
     blurx.bound(z, 0, 12);
     blury.bound(z, 0, 12);
     output.dim(0).set_bounds(0, nx);
-    output.dim(0).set_bounds(0, ny);
+    output.dim(1).set_bounds(0, ny);
     output.dim(1).set_stride(nx);
 
     // CPU schedule.
@@ -137,7 +127,7 @@ int main(int argc, char *argv[]) {
     std::string name = "bilateral_grid";
 
     bilateral_grid.compile_to_pvl(name + "_pvl.pvl", {input}, {}, name, new_target);
-    bilateral_grid.translate_to_pvl(name + "_front_pvl.pvl", {}, {}); 
+    // bilateral_grid.translate_to_pvl(name + "_front_pvl.pvl", {}, {}); 
 
 }
 
