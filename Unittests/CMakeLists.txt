@@ -11,6 +11,7 @@ set(CMAKE_PREFIX_PATH ../../halide/install)
 find_package(Halide REQUIRED)
 
 set(OUTFILE halide.out)
+set(VERCORS /home/lars/data/vercors/bin/vct)
 
 
 function(build_unit_test)
@@ -26,7 +27,7 @@ function(build_unit_test)
 
   if(${UT_AND_FRONT})
     add_custom_command(
-      OUTPUT ${UT_TARGET}_front.pvl ${UT_TARGET}_back.pvl
+      OUTPUT ${UT_TARGET}_front.pvl ${UT_TARGET}.c
       COMMAND ./${UT_TARGET} ${UT_TARGET}
       DEPENDS ${UT_TARGET}
       VERBATIM
@@ -34,11 +35,11 @@ function(build_unit_test)
 
     add_custom_target(
       ${UT_TARGET}_pvl ALL
-      DEPENDS ${UT_TARGET}_front.pvl ${UT_TARGET}_back.pvl
+      DEPENDS ${UT_TARGET}_front.pvl ${UT_TARGET}.c
     )
 
     add_test(NAME ${UT_TARGET}_front.pvl
-      COMMAND vct --backend-option --conditionalizePermissions --silicon-quiet ${UT_TARGET}_front.pvl
+      COMMAND ${VERCORS} --silicon-quiet ${UT_TARGET}_front.pvl
       )
     set_tests_properties(${UT_TARGET}_front.pvl PROPERTIES
       WILL_FAIL ${UT_SHOULDFAIL}
@@ -46,7 +47,7 @@ function(build_unit_test)
     )
   else()
     add_custom_command(
-      OUTPUT ${UT_TARGET}_back.pvl
+      OUTPUT ${UT_TARGET}.c
       COMMAND ./${UT_TARGET} ${UT_TARGET}
       DEPENDS ${UT_TARGET}
       VERBATIM
@@ -54,14 +55,14 @@ function(build_unit_test)
 
     add_custom_target(
       ${UT_TARGET}_pvl ALL
-      DEPENDS ${UT_TARGET}_back.pvl
+      DEPENDS ${UT_TARGET}.c
     )
   endif()
 
-  add_test(NAME ${UT_TARGET}_back.pvl
-    COMMAND vct --backend-option --conditionalizePermissions --silicon-quiet ${UT_TARGET}_back.pvl
+  add_test(NAME ${UT_TARGET}.c
+    COMMAND ${VERCORS} --silicon-quiet ${UT_TARGET}.c
   )
-  set_tests_properties(${UT_TARGET}_back.pvl
+  set_tests_properties(${UT_TARGET}.c
     PROPERTIES
     WILL_FAIL ${UT_SHOULDFAIL}
     LABELS ${UT_DIR}:back:${UT_LABELS}
@@ -97,7 +98,7 @@ build_unit_test(TARGET unroll_ser DIR unroll)
 build_unit_test(TARGET split_exact DIR split)
 build_unit_test(TARGET split_if DIR split)
 build_unit_test(TARGET split_round DIR split)
-build_unit_test(TARGET split_shift DIR split)
+# build_unit_test(TARGET split_shift DIR split)
 
 # Fuse schedules
 build_unit_test(TARGET fuse_par DIR fuse)

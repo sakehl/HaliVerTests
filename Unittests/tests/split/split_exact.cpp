@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   out.ensures(out(x,y) > 0);
 
   Var xo("xo"), xi("xi");
-  out.split(x, xo, xi, 4);
+  out.split(x, xo, xi, 4, TailStrategy::GuardWithIf);
 
   int nx = 100, ny = 42;
   input.dim(0).set_bounds(0, ny);
@@ -35,5 +35,5 @@ int main(int argc, char *argv[]) {
   std::vector<Annotation> pipeline_anns;
 
   std::string name = argv[1];
-  out.compile_to_pvl(name + "_back.pvl" , {input}, pipeline_anns, name, new_target);
+  out.compile_to_c(name + ".c" , {input}, pipeline_anns, name, new_target);
 }

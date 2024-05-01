@@ -29,5 +29,5 @@ int main(int argc, char *argv[]) {
 
   std::string name = argv[1];
   out.translate_to_pvl(name +"_front.pvl", {}, pipeline_anns); 
-  out.compile_to_pvl(name + "_back.pvl" , {}, pipeline_anns, name, new_target);
+  out.compile_to_c(name + ".c" , {}, pipeline_anns, name, new_target);
 }
