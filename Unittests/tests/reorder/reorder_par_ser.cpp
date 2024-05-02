@@ -35,5 +35,13 @@ int main(int argc, char *argv[]) {
   std::vector<Annotation> pipeline_anns;
 
   std::string name = argv[1];
-  out.compile_to_c(name + ".c" , {input}, pipeline_anns, name, new_target);
+  std::string mem_only_s = "";
+  if(argc >= 3){
+    mem_only_s = argv[2];
+  }
+  bool mem_only = mem_only_s == "-mem_only";
+  if(mem_only){
+    name += "_mem";
+  }
+  out.compile_to_c(name + ".c" , {input}, pipeline_anns, name, new_target, mem_only);
 }

@@ -27,15 +27,15 @@ function(build_unit_test)
 
   if(${UT_AND_FRONT})
     add_custom_command(
-      OUTPUT ${UT_TARGET}_front.pvl ${UT_TARGET}.c
-      COMMAND ./${UT_TARGET} ${UT_TARGET}
+      OUTPUT ${UT_TARGET}_front.pvl ${UT_TARGET}_mem.c
+      COMMAND ./${UT_TARGET} ${UT_TARGET} -mem_only
       DEPENDS ${UT_TARGET}
       VERBATIM
     )
 
     add_custom_target(
       ${UT_TARGET}_pvl ALL
-      DEPENDS ${UT_TARGET}_front.pvl ${UT_TARGET}.c
+      DEPENDS ${UT_TARGET}_front.pvl ${UT_TARGET}_mem.c
     )
 
     add_test(NAME ${UT_TARGET}_front.pvl
@@ -47,22 +47,22 @@ function(build_unit_test)
     )
   else()
     add_custom_command(
-      OUTPUT ${UT_TARGET}.c
-      COMMAND ./${UT_TARGET} ${UT_TARGET}
+      OUTPUT ${UT_TARGET}_mem.c
+      COMMAND ./${UT_TARGET} ${UT_TARGET} -mem_only
       DEPENDS ${UT_TARGET}
       VERBATIM
     )
 
     add_custom_target(
       ${UT_TARGET}_pvl ALL
-      DEPENDS ${UT_TARGET}.c
+      DEPENDS ${UT_TARGET}_mem.c
     )
   endif()
 
-  add_test(NAME ${UT_TARGET}.c
-    COMMAND ${VERCORS} --silicon-quiet ${UT_TARGET}.c
+  add_test(NAME ${UT_TARGET}_mem.c
+    COMMAND ${VERCORS} --silicon-quiet ${UT_TARGET}_mem.c
   )
-  set_tests_properties(${UT_TARGET}.c
+  set_tests_properties(${UT_TARGET}_mem.c
     PROPERTIES
     WILL_FAIL ${UT_SHOULDFAIL}
     LABELS ${UT_DIR}:back:${UT_LABELS}
