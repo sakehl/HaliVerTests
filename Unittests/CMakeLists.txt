@@ -79,6 +79,11 @@ build_unit_test(TARGET reduction_multi DIR alg AND_FRONT)
 build_unit_test(TARGET reduction_multi_fail DIR alg SHOULDFAIL AND_FRONT)
 build_unit_test(TARGET input_buffer DIR alg AND_FRONT)
 
+build_unit_test(TARGET tuple DIR alg)
+build_unit_test(TARGET tuple_pipeline DIR alg)
+build_unit_test(TARGET multidim DIR alg)
+build_unit_test(TARGET reduction_where DIR alg)
+
 # Floats / Rationals
 build_unit_test(TARGET input_floats DIR alg AND_FRONT)
 
@@ -105,6 +110,7 @@ build_unit_test(TARGET fuse_par DIR fuse)
 build_unit_test(TARGET fuse_ser DIR fuse)
 
 # Compute_at
+build_unit_test(TARGET inline DIR compute_at)
 build_unit_test(TARGET compute_half DIR compute_at)
 build_unit_test(TARGET compute_root DIR compute_at)
 build_unit_test(TARGET compute_update DIR compute_at)

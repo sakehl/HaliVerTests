@@ -8,15 +8,16 @@ int main(int argc, char *argv[]) {
 
   Func f("f"), out("out");
   Var x("x"), y("y");
-  Param<int> nx("nx"), ny("ny"), minx("minx"), miny("miny");
 
-  out(x, y) = x + y;
-  out.ensures(out(x,y) == x + y);
+  out(x, y) = Tuple(x + y, x-y);
+  // out.ensures(out(x,y) == x + y);
 
-  out.output_buffer().dim(0).set_bounds(minx, nx);
-  out.output_buffer().dim(1).set_bounds(miny, ny);
-  out.output_buffer().dim(1).set_stride(nx);
-
+  int nx = 100, ny = 42;
+  out.output_buffers()[0].dim(0).set_bounds(0,nx);
+  out.output_buffers()[0].dim(1).set_bounds(0,ny);
+  out.output_buffers()[0].dim(1).set_stride(nx);
+  out.output_buffers()[1].dim(1).set_stride(nx);
+  
   Target target = Target();
   Target new_target = target
     .with_feature(Target::NoAsserts)
@@ -35,5 +36,5 @@ int main(int argc, char *argv[]) {
     name += "_mem";
   }
   out.translate_to_pvl(name +"_front.pvl", {}, pipeline_anns); 
-  out.compile_to_c(name + ".c" , {nx, ny, minx, miny}, pipeline_anns, name, new_target, mem_only);
+  out.compile_to_c(name + ".c" , {}, pipeline_anns, name, new_target, mem_only);
 }
