@@ -78,6 +78,6 @@ jobs:
           name: vercors_unix
           path: '.'
       - name: Unzip VerCors
-        run: tar xf out/vercors/main/unixTar.dest/vercors-9999.9.9-SNAPSHOT-unix.tar.xz -C ./vercors
+        run: tar xf vercors-9999.9.9-SNAPSHOT-unix.tar.xz -C ./vercors
       - name: Get version
         run: ./vercors/vercors --version
