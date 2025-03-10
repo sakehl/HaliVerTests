@@ -50,7 +50,7 @@ jobs:
       - name: Cache dependencies and compilation
         uses: actions/cache@v4
         with:
-          path: out
+          path: vercors
           key: vercors-ci-ubuntu-${{ hashFiles('build.sc') }}-${{ hashFiles('src') }}
           restore-keys: |
             vercors-ci-ubuntu-${{ hashFiles('build.sc') }}
