@@ -56,12 +56,12 @@ jobs:
             vercors-ci-ubuntu-${{ hashFiles('build.sc') }}
             vercors-ci-ubuntu
       - name: Compile
-        run: ./mill vercors.main.unixTar
+        run: cd vercors && ./mill vercors.main.unixTar
       - name: Upload VerCors
         uses: actions/upload-artifact@v4
         with:
           name: vercors_unix
-          path: out/vercors/main/unixTar.dest/vercors-9999.9.9-SNAPSHOT-unix.tar.xz
+          path: vercors/out/vercors/main/unixTar.dest/vercors-9999.9.9-SNAPSHOT-unix.tar.xz
           
   run_vercors:
     needs: "compile_vercors"
