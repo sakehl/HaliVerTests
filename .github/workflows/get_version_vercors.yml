@@ -45,5 +45,13 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+      - name: Cache dependencies and compilation
+        uses: actions/cache@v4
+        with:
+          path: out
+          key: vercors-ci-ubuntu-${{ hashFiles('build.sc') }}-${{ hashFiles('src') }}
+          restore-keys: |
+            vercors-ci-ubuntu-${{ hashFiles('build.sc') }}
+            vercors-ci-ubuntu
       - name: Get version
         run: ./vercors/bin/vct --version
