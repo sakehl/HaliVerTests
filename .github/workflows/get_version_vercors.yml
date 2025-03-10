@@ -39,7 +39,7 @@ jobs:
       - name: Clone VerCors
         uses: actions/checkout@v4
         with:
-          repository: 'github.com/utwente-fmt/vercors'
+          repository: 'utwente-fmt/vercors'
           path: 'vercors'
           ref: 'AddSMTSolver'
       - name: Install Java
